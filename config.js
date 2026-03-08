@@ -61,6 +61,7 @@ const CONFIG = {
     // Format: "Pokemon Name": "https://your-image-url.jpg"
     // If you don't have a photo, leave it out - it will show a placeholder
     images: {
+        "Bulbasaur": "https://imgur.com/a/1yvDBO8"
         // Examples (replace with your actual image URLs):
         // "Bulbasaur": "https://imgur.com/a/1yvDBO8",
         // "Charizard": "https://i.imgur.com/yourcharizard.jpg",
