@@ -101,7 +101,7 @@ const CONFIG = {
         "Pikachu": "https://i.imgur.com/eOUEimi.jpeg",
         "Pichu": "https://i.imgur.com/frd6yed.png",
         "Gyarados": "https://i.imgur.com/EZlSIeM.png",
-        "Wartortle": "https://i.imgur.com/Y2Ty1iP.png"
+        "Wartortle": "https://i.imgur.com/Y2Ty1iP.png",
         // Examples (replace with your actual image URLs):
         // "Bulbasaur": "https://imgur.com/a/1yvDBO8",
         // "Charizard": "https://i.imgur.com/yourcharizard.jpg",
