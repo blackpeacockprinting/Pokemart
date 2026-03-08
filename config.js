@@ -98,7 +98,7 @@ const CONFIG = {
         "Espeon": "https://i.imgur.com/picLcjT.jpeg",
         "Leafeon": "https://i.imgur.com/IL3AR6s.jpeg",
         "Kyogre": "https://i.imgur.com/6N5r40r.jpeg",
-        "Pikachu": "https://i.imgur.com/eOUEimi.jpeg"
+        "Pikachu": "https://i.imgur.com/eOUEimi.jpeg",
         "Pichu": "https://i.imgur.com/frd6yed.png",
         "Gyarados": "https://i.imgur.com/EZlSIeM.png",
         "Wartortle": "https://i.imgur.com/Y2Ty1iP.png"
