@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poké Mart - Local Order Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Load config file FIRST -->
+    <script src="config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Rajdhani', sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
+            min-height: 100vh; 
+            color: #fff; 
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .pokeball-logo { width: 100px; height: 100px; margin: 0 auto 15px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .pokeball { 
+            width: 100%; height: 100%; 
+            background: linear-gradient(to bottom, #ff0000 0%, #ff0000 48%, #000 48%, #000 52%, #fff 52%, #fff 100%); 
+            border-radius: 50%; border: 6px solid #000; position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+        .pokeball::before { 
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 35px; height: 35px; background: #fff; border: 5px solid #000; border-radius: 50%; z-index: 2; 
+        }
+        .pokeball::after { 
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 15px; height: 15px; background: #fff; border: 3px solid #000; border-radius: 50%; z-index: 3; 
+        }
+        h1 { 
+            font-family: 'Exo 2', sans-serif; font-size: 3.5rem; font-weight: 900; text-transform: uppercase; 
+            letter-spacing: 4px; color: #ff0000; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin-bottom: 10px; 
+        }
+        .subtitle { font-size: 1.3rem; color: #ffd700; text-transform: uppercase; letter-spacing: 6px; font-weight: 700; }
+        .local-badge { 
+            display: inline-block; background: #00aa00; color: white; padding: 8px 20px; 
+            border-radius: 20px; font-weight: bold; margin-top: 15px; font-size: 0.9rem; 
+            text-transform: uppercase; letter-spacing: 2px; 
+        }
+        .cart-summary { 
+            background: rgba(0,0,0,0.9); border: 2px solid #ffd700; border-radius: 15px; 
+            padding: 20px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+        .cart-title { 
+            font-family: 'Exo 2', sans-serif; font-size: 1.3rem; color: #ffd700; margin-bottom: 15px; 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .cart-count { 
+            background: #ff0000; color: white; border-radius: 50%; width: 25px; height: 25px; 
+            display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold; 
+        }
+        .cart-items { max-height: 200px; overflow-y: auto; margin-bottom: 15px; font-size: 0.9rem; }
+        .cart-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .cart-total { 
+            font-size: 1.4rem; font-weight: bold; color: #ffd700; border-top: 2px solid #ffd700; 
+            padding-top: 10px; margin-top: 10px; 
+        }
+        .payment-info { margin-top: 10px; font-size: 0.85rem; color: rgba(255,255,255,0.7); font-style: italic; }
+        .checkout-btn { 
+            width: 100%; padding: 12px; margin-top: 15px; background: #ff0000; border: none; 
+            border-radius: 8px; color: white; font-family: 'Exo 2', sans-serif; font-weight: 700; 
+            font-size: 1.1rem; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; 
+        }
+        .checkout-btn:hover { background: #ff6b6b; }
+        .controls { 
+            background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; 
+            margin-bottom: 30px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; 
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
+        .search-box { flex: 1; min-width: 250px; }
+        .search-box input { 
+            width: 100%; padding: 12px 20px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.2); 
+            background: rgba(0,0,0,0.3); color: white; font-size: 1rem; font-family: 'Rajdhani', sans-serif; 
+        }
+        .filter-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-btn { 
+            padding: 10px 20px; border: 2px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); 
+            color: white; border-radius: 25px; cursor: pointer; font-family: 'Rajdhani', sans-serif; 
+            font-weight: 600; text-transform: uppercase; 
+        }
+        .filter-btn:hover, .filter-btn.active { background: #ff0000; border-color: #ff0000; }
+        .section { 
+            margin-bottom: 40px; background: rgba(255,255,255,0.05); border-radius: 20px; 
+            padding: 30px; border: 1px solid rgba(255,255,255,0.1); 
+        }
+        .section-title { 
+            font-family: 'Exo 2', sans-serif; font-size: 1.8rem; font-weight: 700; 
+            text-transform: uppercase; letter-spacing: 3px; margin-bottom: 25px; 
+            display: flex; align-items: center; gap: 15px; border-bottom: 3px solid #ff0000; padding-bottom: 15px; 
+        }
+        .section-icon { font-size: 2rem; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .product-card { 
+            background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; 
+            border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s; 
+        }
+        .product-card:hover { transform: translateY(-5px); border-color: #ff0000; }
+        .product-card.selected { border-color: #ffd700; background: rgba(255,215,0,0.15); }
+        /* PHOTO STYLES */
+        .product-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+        .product-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .product-ball { 
+            width: 50px; height: 50px; 
+            background: linear-gradient(to bottom, #ff0000 0%, #ff0000 45%, #000 45%, #000 55%, #fff 55%, #fff 100%); 
+            border-radius: 50%; border: 3px solid #000; position: relative; flex-shrink: 0; 
+        }
+        .product-ball::after { 
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 16px; height: 16px; background: #fff; border: 3px solid #000; border-radius: 50%; 
+        }
+        .product-info h3 { font-family: 'Exo 2', sans-serif; font-size: 1.3rem; text-transform: capitalize; margin-bottom: 5px; }
+        .product-type { font-size: 0.9rem; color: rgba(255,255,255,0.6); text-transform: uppercase; }
+        .product-price { font-size: 1.5rem; font-weight: bold; color: #ffd700; margin: 10px 0; }
+        .quantity-control { display: flex; align-items: center; gap: 15px; margin-top: 15px; }
+        .qty-btn { 
+            width: 35px; height: 35px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); 
+            background: rgba(0,0,0,0.3); color: white; font-size: 1.2rem; cursor: pointer; 
+        }
+        .qty-btn:hover { background: #ff0000; border-color: #ff0000; }
+        .qty-display { font-size: 1.3rem; font-weight: bold; min-width: 40px; text-align: center; }
+        .add-to-cart { 
+            width: 100%; padding: 12px; margin-top: 15px; background: #00aa00; border: none; 
+            border-radius: 8px; color: white; font-family: 'Exo 2', sans-serif; font-weight: 700; 
+            cursor: pointer; text-transform: uppercase; 
+        }
+        .add-to-cart:hover { background: #00cc00; }
+        .add-to-cart.added { background: #ffd700; color: #000; }
+        .mega-section .product-card { border-left: 4px solid #ffd700; }
+        .special-section .product-card { border-left: 4px solid #00ffff; }
+        .event-section .product-card { border-left: 4px solid #ff69b4; }
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; 
+        }
+        .modal.active { display: flex; }
+        .modal-content { 
+            background: #1a1a2e; border: 2px solid #ffd700; border-radius: 20px; padding: 40px; 
+            max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; 
+        }
+        .modal-close { 
+            position: absolute; top: 15px; right: 20px; font-size: 2rem; color: #fff; 
+            cursor: pointer; 
+        }
+        .modal-close:hover { color: #ff0000; }
+        .modal h2 { 
+            font-family: 'Exo 2', sans-serif; font-size: 2rem; margin-bottom: 20px; 
+            color: #ffd700; text-align: center; 
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { 
+            display: block; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; 
+            font-size: 0.9rem; color: rgba(255,255,255,0.8); 
+        }
+        .form-group input, .form-group textarea, .form-group select { 
+            width: 100%; padding: 12px; border: 2px solid rgba(255,255,255,0.2); 
+            background: rgba(0,0,0,0.3); color: white; border-radius: 8px; 
+            font-family: 'Rajdhani', sans-serif; font-size: 1rem; 
+        }
+        .order-summary { 
+            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; 
+            margin: 20px 0; max-height: 200px; overflow-y: auto; 
+        }
+        .order-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .submit-order { 
+            width: 100%; padding: 15px; background: #ff0000; border: none; border-radius: 8px; 
+            color: white; font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 1.2rem; 
+            cursor: pointer; text-transform: uppercase; margin-top: 10px; 
+        }
+        .submit-order:hover { background: #ff6b6b; }
+        .success-message { 
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: #00aa00; padding: 30px 50px; border-radius: 15px; text-align: center; 
+            z-index: 3000; border: 3px solid #fff; 
+        }
+        .success-message.active { display: block; }
+        .success-message h3 { font-family: 'Exo 2', sans-serif; font-size: 1.8rem; margin-bottom: 10px; }
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .product-grid { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="pokeball-logo">
+                <div class="pokeball"></div>
+            </div>
+            <h1>Poké Mart</h1>
+            <p class="subtitle">Custom 3D Printed Pokéballs</p>
+            <div class="local-badge">🌟 Local Pickup Only</div>
+        </header>
+        
+        <div class="cart-summary">
+            <div class="cart-title">
+                🛒 Your Order
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <p style="color: rgba(255,255,255,0.5);">No items yet</p>
+            </div>
+            <div class="cart-total">Total: $<span id="cartTotal">0.00</span></div>
+            <div class="payment-info">💵 Cash or Zelle on pickup</div>
+            <button class="checkout-btn" onclick="openCheckout()">Place Order</button>
+        </div>
+        
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search Pokémon..." onkeyup="filterPokemon()">
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-btn active" onclick="filterCategory('all')">All</button>
+                <button class="filter-btn" onclick="filterCategory('standard')">Standard ($<span id="price-standard">8</span>)</button>
+                <button class="filter-btn" onclick="filterCategory('mega')">Mega ($<span id="price-mega">10</span>)</button>
+                <button class="filter-btn" onclick="filterCategory('special')">Special ($<span id="price-special">10</span>)</button>
+                <button class="filter-btn" onclick="filterCategory('event')">Event ($<span id="price-event">8</span>)</button>
+            </div>
+        </div>
+        
+        <section class="section" id="standard-section">
+            <h2 class="section-title"><span class="section-icon">⭐</span> Standard Pokémon ($<span id="section-price-standard">8</span>)</h2>
+            <div class="product-grid" id="standard-grid"></div>
+        </section>
+        
+        <section class="section mega-section" id="mega-section">
+            <h2 class="section-title"><span class="section-icon">💎</span> Mega Evolutions ($<span id="section-price-mega">10</span>)</h2>
+            <div class="product-grid" id="mega-grid"></div>
+        </section>
+        
+        <section class="section special-section" id="special-section">
+            <h2 class="section-title"><span class="section-icon">✨</span> Special Forms ($<span id="section-price-special">10</span>)</h2>
+            <div class="product-grid" id="special-grid"></div>
+        </section>
+        
+        <section class="section event-section" id="event-section">
+            <h2 class="section-title"><span class="section-icon">🎉</span> Event Pokémon ($<span id="section-price-event">8</span>)</h2>
+            <div class="product-grid" id="event-grid"></div>
+        </section>
+    </div>
+    
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeCheckout()">&times;</span>
+            <h2>Complete Your Order</h2>
+            
+            <form id="orderForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSeWDeDLu3G_anztBC2TU4rNa-nuyhgNNph5sBlO8Et4glgnBA/formResponse" method="POST" target="_blank">
+                
+                <div class="form-group">
+                    <label>Your Name *</label>
+                    <input type="text" name="entry.1348287636" required placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" name="entry.433867564" required placeholder="your@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" name="entry.194469674" required placeholder="(555) 123-4567">
+                </div>
+                
+                <div class="form-group">
+                    <label>Preferred Contact Method</label>
+                    <select name="entry.2016762598">
+                        <option value="Text">Text</option>
+                        <option value="Call">Call</option>
+                        <option value="Email">Email</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Order Details *</label>
+                    <textarea name="entry.1022683128" id="orderDetailsField" rows="4" readonly style="background: rgba(0,0,0,0.5);"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Order Total *</label>
+                    <input type="text" name="entry.1494456050" id="orderTotalField" readonly style="background: rgba(0,0,0,0.5); font-weight: bold; color: #ffd700;">
+                </div>
+                
+                <div style="background: rgba(0,170,0,0.2); border: 1px solid #00aa00; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                    <p style="color: #00ff00; font-weight: bold;">💵 Payment due on pickup</p>
+                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">Cash or Zelle accepted</p>
+                </div>
+                
+                <button type="submit" class="submit-order" onclick="return prepareAndSubmit()">Send Order</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="success-message" id="successMessage">
+        <h3>🎉 Order Sent!</h3>
+        <p>We'll contact you soon to arrange pickup.</p>
+    </div>
+
+    <script>
+        // Use CONFIG from config.js file!
+        let cart = {};
+        
+        function init() {
+            // Update prices from config
+            document.getElementById('price-standard').textContent = CONFIG.pricing.standard;
+            document.getElementById('price-mega').textContent = CONFIG.pricing.mega;
+            document.getElementById('price-special').textContent = CONFIG.pricing.special;
+            document.getElementById('price-event').textContent = CONFIG.pricing.event;
+            
+            document.getElementById('section-price-standard').textContent = CONFIG.pricing.standard;
+            document.getElementById('section-price-mega').textContent = CONFIG.pricing.mega;
+            document.getElementById('section-price-special').textContent = CONFIG.pricing.special;
+            document.getElementById('section-price-event').textContent = CONFIG.pricing.event;
+            
+            // Render products from config
+            Object.keys(CONFIG.pokemon).forEach(category => {
+                const grid = document.getElementById(`${category}-grid`);
+                const price = CONFIG.pricing[category];
+                
+                grid.innerHTML = CONFIG.pokemon[category].map(name => {
+                    // Check if there's a photo for this Pokémon
+                    const imageUrl = CONFIG.images[name];
+                    const imageHtml = imageUrl ? 
+                        `<div class="product-image"><img src="${imageUrl}" alt="${name} Pokéball" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="product-ball" style="display:none;"></div></div>` :
+                        `<div class="product-header"><div class="product-ball"></div><div class="product-info"><h3>${name}</h3><div class="product-type">${category}</div></div></div>`;
+                    
+                    const headerHtml = imageUrl ? 
+                        `<div class="product-header"><div class="product-info"><h3>${name}</h3><div class="product-type">${category}</div></div></div>` :
+                        imageHtml;
+                    
+                    return `
+                    <div class="product-card" data-name="${name}" data-category="${category}" data-price="${price}">
+                        ${imageHtml}
+                        <div class="product-price">$${price}.00</div>
+                        <div class="quantity-control">
+                            <button class="qty-btn" onclick="updateQuantity('${name}', -1)">−</button>
+                            <span class="qty-display" id="qty-${name.replace(/\s+/g, '-')}">0</span>
+                            <button class="qty-btn" onclick="updateQuantity('${name}', 1)">+</button>
+                        </div>
+                        <button class="add-to-cart" id="btn-${name.replace(/\s+/g, '-')}" onclick="addToCart('${name}', ${price})">Add to Cart</button>
+                    </div>
+                `}).join('');
+            });
+        }
+        
+        function updateQuantity(name, change) {
+            const display = document.getElementById(`qty-${name.replace(/\s+/g, '-')}`);
+            let current = parseInt(display.textContent);
+            current = Math.max(0, current + change);
+            display.textContent = current;
+            const btn = document.getElementById(`btn-${name.replace(/\s+/g, '-')}`);
+            btn.textContent = current > 0 ? 'Update Cart' : 'Add to Cart';
+            btn.classList.toggle('added', current > 0);
+        }
+        
+        function addToCart(name, price) {
+            const qty = parseInt(document.getElementById(`qty-${name.replace(/\s+/g, '-')}`).textContent);
+            if (qty === 0) delete cart[name];
+            else cart[name] = { quantity: qty, price: price };
+            updateCartDisplay();
+            document.querySelector(`[data-name="${name}"]`).classList.toggle('selected', qty > 0);
+        }
+        
+        function updateCartDisplay() {
+            const count = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+            const total = Object.values(cart).reduce((sum, item) => sum + (item.quantity * item.price), 0);
+            document.getElementById('cartCount').textContent = count;
+            document.getElementById('cartTotal').textContent = total.toFixed(2);
+            const cartItems = document.getElementById('cartItems');
+            cartItems.innerHTML = count === 0 ? '<p style="color: rgba(255,255,255,0.5);">No items yet</p>' :
+                Object.entries(cart).map(([name, item]) => `
+                    <div class="cart-item">
+                        <span>${name} x${item.quantity}</span>
+                        <span>$${(item.quantity * item.price).toFixed(2)}</span>
+                    </div>
+                `).join('');
+        }
+        
+        function filterPokemon() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.style.display = card.dataset.name.toLowerCase().includes(search) ? 'block' : 'none';
+            });
+        }
+        
+        function filterCategory(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            ['standard', 'mega', 'special', 'event'].forEach(sec => {
+                document.getElementById(`${sec}-section`).style.display = (category === 'all' || category === sec) ? 'block' : 'none';
+            });
+        }
+        
+        function openCheckout() {
+            if (Object.keys(cart).length === 0) { alert('Please add items to your cart first!'); return; }
+            
+            const total = Object.values(cart).reduce((sum, item) => sum + (item.quantity * item.price), 0);
+            const orderDetails = Object.entries(cart).map(([name, item]) => 
+                `${name} (x${item.quantity}) - $${(item.quantity * item.price).toFixed(2)}`
+            ).join('\n');
+            
+            document.getElementById('orderDetailsField').value = orderDetails;
+            document.getElementById('orderTotalField').value = `$${total.toFixed(2)}`;
+            
+            document.getElementById('checkoutModal').classList.add('active');
+        }
+        
+        function closeCheckout() { 
+            document.getElementById('checkoutModal').classList.remove('active'); 
+        }
+        
+        function prepareAndSubmit() {
+            const detailsField = document.getElementById('orderDetailsField');
+            const totalField = document.getElementById('orderTotalField');
+            
+            if (!detailsField.value || !totalField.value) {
+                alert('Error: Order details not loaded. Please try again.');
+                return false;
+            }
+            
+            document.getElementById('successMessage').classList.add('active');
+            
+            setTimeout(() => {
+                cart = {}; 
+                updateCartDisplay();
+                document.querySelectorAll('.qty-display').forEach(el => el.textContent = '0');
+                document.querySelectorAll('.add-to-cart').forEach(el => { 
+                    el.textContent = 'Add to Cart'; 
+                    el.classList.remove('added'); 
+                });
+                document.querySelectorAll('.product-card').forEach(el => el.classList.remove('selected'));
+                closeCheckout();
+            }, 1000);
+            
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.remove('active');
+            }, 4000);
+            
+            return true;
+        }
+        
+        window.onclick = function(event) { 
+            if (event.target === document.getElementById('checkoutModal')) closeCheckout(); 
+        }
+        
+        init();
+    </script>
+</body>
+</html>
