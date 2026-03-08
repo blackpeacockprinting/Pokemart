@@ -62,6 +62,7 @@ const CONFIG = {
     // If you don't have a photo, leave it out - it will show a placeholder
     images: {
         "Bulbasaur": "https://i.imgur.com/Mh8kPfD.jpeg"
+        "Snorlax": "https://i.imgur.com/OCETqj6_d.jpeg?maxwidth=520&shape=thumb&fidelity=high"
         // Examples (replace with your actual image URLs):
         // "Bulbasaur": "https://imgur.com/a/1yvDBO8",
         // "Charizard": "https://i.imgur.com/yourcharizard.jpg",
