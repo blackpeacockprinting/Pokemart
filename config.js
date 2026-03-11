@@ -13,7 +13,7 @@ const CONFIG = {
         teamDiscount: 0.15
     },
     
-    // BUNDLE DEALS
+    // BUNDLE DEALS - Fixed prices for actual savings
     bundles: {
         "Starter Trio": {
             items: ["Bulbasaur", "Charmander", "Squirtle"],
@@ -32,7 +32,7 @@ const CONFIG = {
         },
         "Dragon Masters": {
             items: ["Dragonite", "Salamence", "Garchomp", "Rayquaza"],
-            price: 32,
+            price: 30,
             description: "Powerful dragon types"
         }
     },
