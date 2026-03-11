@@ -102,7 +102,7 @@ const CONFIG = {
         "Pichu": "https://i.imgur.com/frd6yed.png",
         "Gyarados": "https://i.imgur.com/EZlSIeM.png",
         "Wartortle": "https://i.imgur.com/Y2Ty1iP.png",
-        "Shiny Raquaza": "https://i.imgur.com/cp5j8qp.png",
+        "Shiny Rayquaza": "https://i.imgur.com/cp5j8qp.png",
         "Shiny Gyarados": "https://i.imgur.com/O6XENFn.png",
         "Shiny Metagross": "https://i.imgur.com/jwx4AXx.png",
         "Charmander": "https://i.imgur.com/Q1UBK4m.png",
