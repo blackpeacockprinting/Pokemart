@@ -1,18 +1,51 @@
 // ============================================
 // POKÉ MART CONFIGURATION FILE
-// Edit this file to add Pokémon, change prices, or add photos!
 // ============================================
 
 const CONFIG = {
-    // PRICING - Change these if you want to adjust prices
+    // PRICING
     pricing: {
         standard: 8,
         mega: 10,
         special: 10,
-        event: 8
+        event: 8,
+        mystery: 6,
+        teamDiscount: 0.15
     },
     
-    // POKÉMON LISTS - Add new names here!
+    // BUNDLE DEALS
+    bundles: {
+        "Starter Trio": {
+            items: ["Bulbasaur", "Charmander", "Squirtle"],
+            price: 20,
+            description: "The classic Kanto starters!"
+        },
+        "Eeveelution Pack": {
+            items: ["Eevee", "Vaporeon", "Jolteon", "Flareon"],
+            price: 28,
+            description: "All original Eeveelutions"
+        },
+        "Legendary Birds": {
+            items: ["Articuno", "Zapdos", "Moltres"],
+            price: 20,
+            description: "The legendary trio"
+        },
+        "Dragon Masters": {
+            items: ["Dragonite", "Salamence", "Garchomp", "Rayquaza"],
+            price: 32,
+            description: "Powerful dragon types"
+        }
+    },
+    
+    // MYSTERY BALL RARITY TIERS
+    mysteryTiers: {
+        common: { chance: 0.5, multiplier: 1, color: "#a8a878" },
+        uncommon: { chance: 0.3, multiplier: 1.2, color: "#6890f0" },
+        rare: { chance: 0.15, multiplier: 1.5, color: "#f8d030" },
+        legendary: { chance: 0.05, multiplier: 2, color: "#ffd700" }
+    },
+    
+    // POKEMON LISTS
     pokemon: {
         standard: [
             "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", "Charizard",
@@ -57,9 +90,7 @@ const CONFIG = {
         ]
     },
     
-    // PHOTOS - Add image URLs here!
-    // Format: "Pokemon Name": "https://your-image-url.jpg"
-    // If you don't have a photo, leave it out - it will show a placeholder
+    // IMAGES
     images: {
         "Bulbasaur": "https://i.imgur.com/Mh8kPfD.jpeg",
         "Snorlax": "https://i.imgur.com/OCETqj6.jpeg",
