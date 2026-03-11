@@ -326,6 +326,12 @@
             animation: shakeBall 0.5s infinite;
         }
         
+        .mystery-ball.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            animation: none;
+        }
+        
         @keyframes shakeBall {
             0%, 100% { transform: rotate(-5deg); }
             50% { transform: rotate(5deg); }
@@ -487,7 +493,7 @@
             transform: scale(1.2);
         }
         
-        /* Cart Summary */
+        /* Cart Summary - UPDATED with remove buttons */
         .cart-summary { 
             background: rgba(0,0,0,0.9); 
             border: 2px solid #ffd700; 
@@ -515,10 +521,65 @@
         }
         
         .cart-items { max-height: 200px; overflow-y: auto; margin-bottom: 15px; font-size: 0.9rem; }
-        .cart-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        
+        /* NEW: Cart item with remove button */
+        .cart-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 8px 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+        }
+        
+        .cart-item-info {
+            flex: 1;
+        }
+        
+        .cart-item-remove {
+            background: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cart-item-remove:hover {
+            background: #ff4444;
+            transform: scale(1.1);
+        }
+        
+        .clear-cart-btn {
+            background: rgba(255,0,0,0.3);
+            border: 1px solid #ff0000;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .clear-cart-btn:hover {
+            background: rgba(255,0,0,0.5);
+        }
+        
         .cart-total { 
-            font-size: 1.4rem; font-weight: bold; color: #ffd700; border-top: 2px solid #ffd700; 
-            padding-top: 10px; margin-top: 10px; 
+            font-size: 1.4rem; 
+            font-weight: bold; 
+            color: #ffd700; 
+            border-top: 2px solid #ffd700; 
+            padding-top: 10px; 
+            margin-top: 10px; 
         }
         
         .payment-info { margin-top: 10px; font-size: 0.85rem; color: rgba(255,255,255,0.7); font-style: italic; }
@@ -1030,18 +1091,19 @@
             </div>
         </div>
         
-        <!-- Mystery Ball -->
+        <!-- Mystery Ball - FIXED: No more re-rolls -->
         <div class="mystery-section">
             <h2 class="section-title"><span class="section-icon">❓</span> Mystery Pokéball <small style="font-size: 0.6em; color: #8a2be2;">Only $6!</small></h2>
-            <p>Try your luck! Get a random Pokéball at a discount. Rarities: Common (50%), Uncommon (30%), Rare (15%), Legendary (5%)</p>
+            <p>Try your luck! Click the ball to reveal your Pokémon. You only get ONE reveal per purchase!</p>
             <div class="mystery-ball" id="mysteryBall" onclick="openMysteryBall()"></div>
-            <button class="add-to-cart" onclick="addMysteryToCart()" style="background: #8a2be2; max-width: 200px; margin: 0 auto; display: block;">Buy Mystery Ball ($6)</button>
+            <button class="add-to-cart" id="mysteryBuyBtn" onclick="addMysteryToCart()" style="background: #8a2be2; max-width: 200px; margin: 0 auto; display: block;">Buy Mystery Ball ($6)</button>
             
             <div class="mystery-result" id="mysteryResult">
                 <h3 id="mysteryPokemon"></h3>
                 <div id="mysteryImage"></div>
                 <div class="rarity-badge" id="rarityBadge"></div>
                 <p id="mysteryValue"></p>
+                <p style="color: #ffd700; margin-top: 10px;">Click "Buy Mystery Ball" above to add this to your cart!</p>
             </div>
         </div>
         
@@ -1061,6 +1123,7 @@
             <div class="bundle-grid" id="bundleGrid"></div>
         </div>
         
+        <!-- Cart Summary with Remove Buttons -->
         <div class="cart-summary">
             <div class="cart-title">
                 🛒 Your Order
@@ -1167,7 +1230,7 @@
     </div>
 
     <script>
-        // DUAL TYPE POKEMON - Fixed to show both types
+        // DUAL TYPE POKEMON
         const pokemonTypes = {
             "Bulbasaur": ["grass", "poison"], "Ivysaur": ["grass", "poison"], "Venusaur": ["grass", "poison"],
             "Charmander": ["fire"], "Charmeleon": ["fire"], "Charizard": ["fire", "flying"],
@@ -1261,6 +1324,7 @@
         let wishlist = JSON.parse(localStorage.getItem('pokemart_wishlist') || '[]');
         let currentTypeFilter = 'all';
         let lastMysteryResult = null;
+        let mysteryRevealed = false; // NEW: Track if mystery ball was already revealed
         
         function init() {
             createFloatingBalls();
@@ -1311,7 +1375,6 @@
             });
         }
         
-        // FIXED: Now shows dual types properly
         function renderProducts() {
             Object.keys(CONFIG.pokemon).forEach(category => {
                 const grid = document.getElementById(`${category}-grid`);
@@ -1323,17 +1386,14 @@
                     const primaryType = Array.isArray(types) ? types[0] : types;
                     const isWishlisted = wishlist.includes(name);
                     
-                    // Create type badges for all types
                     let typeBadgesHtml = '';
                     if (Array.isArray(types)) {
-                        // Multiple types - show both badges in top right
                         typeBadgesHtml = `<div style="position: absolute; top: 10px; right: 10px; z-index: 2; display: flex; gap: 5px;">`;
                         types.forEach(t => {
                             typeBadgesHtml += `<span class="type-badge type-${t}">${t}</span>`;
                         });
                         typeBadgesHtml += `</div>`;
                     } else {
-                        // Single type
                         typeBadgesHtml = `<span class="type-badge type-${types}">${types}</span>`;
                     }
                     
@@ -1456,8 +1516,14 @@
             return 'standard';
         }
         
-        // Mystery Ball Functions
+        // FIXED Mystery Ball - No more re-rolls!
         function openMysteryBall() {
+            // Prevent multiple reveals
+            if (mysteryRevealed) {
+                alert('You already revealed a Pokémon! Add it to cart or refresh the page to try again.');
+                return;
+            }
+            
             const ball = document.getElementById('mysteryBall');
             const result = document.getElementById('mysteryResult');
             
@@ -1466,6 +1532,8 @@
             
             setTimeout(() => {
                 ball.classList.remove('shaking');
+                ball.classList.add('disabled'); // Disable further clicks
+                mysteryRevealed = true;
                 revealMystery();
             }, 2000);
         }
@@ -1507,16 +1575,33 @@
         
         function addMysteryToCart() {
             if (!lastMysteryResult) {
-                alert('Open a mystery ball first!');
+                alert('Click the mystery ball first to reveal your Pokémon!');
                 return;
             }
+            
+            // Check if already added
+            const mysteryKey = `Mystery: ${lastMysteryResult.name}`;
+            if (cart[mysteryKey]) {
+                alert('This mystery ball is already in your cart!');
+                return;
+            }
+            
             const { name, value } = lastMysteryResult;
-            cart[`Mystery: ${name}`] = { quantity: 1, price: CONFIG.pricing.mystery, actualValue: value };
+            cart[mysteryKey] = { quantity: 1, price: CONFIG.pricing.mystery, actualValue: value };
             updateCartDisplay();
             alert(`Added Mystery ${name} to cart!`);
+            
+            // Reset for next purchase
+            resetMysteryBall();
         }
         
-        // FIXED: Bundle savings calculation
+        function resetMysteryBall() {
+            mysteryRevealed = false;
+            lastMysteryResult = null;
+            document.getElementById('mysteryBall').classList.remove('disabled');
+            document.getElementById('mysteryResult').classList.remove('revealed');
+        }
+        
         function renderBundles() {
             const grid = document.getElementById('bundleGrid');
             grid.innerHTML = Object.entries(CONFIG.bundles).map(([name, data]) => {
@@ -1665,19 +1750,67 @@
             document.querySelector(`[data-name="${name}"]`).classList.toggle('selected', qty > 0);
         }
         
+        // NEW: Remove item from cart
+        function removeFromCart(name) {
+            delete cart[name];
+            updateCartDisplay();
+            
+            // Reset quantity display if it was a regular pokemon
+            const qtyDisplay = document.getElementById(`qty-${name.replace(/\s+/g, '-')}`);
+            if (qtyDisplay) {
+                qtyDisplay.textContent = '0';
+                const btn = document.getElementById(`btn-${name.replace(/\s+/g, '-')}`);
+                if (btn) {
+                    btn.textContent = 'Add to Cart';
+                    btn.classList.remove('added');
+                }
+            }
+            
+            // Remove selected class from card
+            const card = document.querySelector(`[data-name="${name}"]`);
+            if (card) card.classList.remove('selected');
+        }
+        
+        // NEW: Clear entire cart
+        function clearCart() {
+            if (Object.keys(cart).length === 0) return;
+            if (!confirm('Are you sure you want to clear your entire cart?')) return;
+            
+            cart = {};
+            updateCartDisplay();
+            
+            // Reset all quantity displays
+            document.querySelectorAll('.qty-display').forEach(el => el.textContent = '0');
+            document.querySelectorAll('.add-to-cart').forEach(el => { 
+                el.textContent = 'Add to Cart'; 
+                el.classList.remove('added'); 
+            });
+            document.querySelectorAll('.product-card').forEach(el => el.classList.remove('selected'));
+        }
+        
+        // UPDATED: Cart display with remove buttons
         function updateCartDisplay() {
             const count = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
             const total = Object.values(cart).reduce((sum, item) => sum + (item.quantity * item.price), 0);
             document.getElementById('cartCount').textContent = count;
             document.getElementById('cartTotal').textContent = total.toFixed(2);
             const cartItems = document.getElementById('cartItems');
-            cartItems.innerHTML = count === 0 ? '<p style="color: rgba(255,255,255,0.5);">No items yet</p>' :
-                Object.entries(cart).map(([name, item]) => `
+            
+            if (count === 0) {
+                cartItems.innerHTML = '<p style="color: rgba(255,255,255,0.5);">No items yet</p>';
+            } else {
+                cartItems.innerHTML = Object.entries(cart).map(([name, item]) => `
                     <div class="cart-item">
-                        <span>${name} x${item.quantity}</span>
-                        <span>$${(item.quantity * item.price).toFixed(2)}</span>
+                        <div class="cart-item-info">
+                            <span>${name} x${item.quantity}</span>
+                            <span style="color: #ffd700;"> $${(item.quantity * item.price).toFixed(2)}</span>
+                        </div>
+                        <button class="cart-item-remove" onclick="removeFromCart('${name}')" title="Remove item">×</button>
                     </div>
-                `).join('');
+                `).join('') + `
+                    <button class="clear-cart-btn" onclick="clearCart()">🗑 Clear Entire Cart</button>
+                `;
+            }
         }
         
         function filterPokemon() {
