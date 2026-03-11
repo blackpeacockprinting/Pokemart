@@ -19,7 +19,7 @@ const CONFIG = {
             "Squirtle", "Wartortle", "Blastoise", "Caterpie", "Metapod", "Butterfree",
             "Weedle", "Kakuna", "Beedrill", "Pidgey", "Pidgeotto", "Pidgeot",
             "Rattata", "Raticate", "Spearow", "Fearow", "Ekans", "Arbok",
-            "Pikachu", "Raichu", "Sandshrew", "Sandslash", "Nidoran♀", "Nidorina",
+            "Pikachu", "Female Pikachu", "Raichu", "Sandshrew", "Sandslash", "Nidoran♀", "Nidorina",
             "Nidoqueen", "Nidoran♂", "Nidorino", "Nidoking", "Clefairy", "Clefable",
             "Vulpix", "Ninetales", "Jigglypuff", "Wigglytuff", "Zubat", "Golbat",
             "Oddish", "Gloom", "Vileplume", "Paras", "Parasect", "Venonat",
@@ -32,14 +32,14 @@ const CONFIG = {
             "Voltorb", "Electrode", "Exeggcute", "Exeggutor", "Cubone", "Marowak",
             "Koffing", "Weezing", "Chansey", "Kangaskhan", "Horsea", "Seadra",
             "Staryu", "Starmie", "Scyther", "Electabuzz", "Pinsir", "Tauros",
-            "Magikarp", "Gyarados", "Lapras", "Ditto", "Eevee", "Vaporeon",
+            "Magikarp", "Gyarados", "Shiny Gyarados", "Lapras", "Ditto", "Eevee", "Vaporeon",
             "Jolteon", "Flareon", "Snorlax", "Articuno", "Zapdos", "Moltres",
             "Dratini", "Dragonair", "Dragonite", "Mewtwo", "Mew", "Chikorita",
             "Cyndaquil", "Totodile", "Furret", "Pichu", "Togepi", "Wooper",
             "Espeon", "Umbreon", "Raikou", "Entei", "Suicune", "Tyranitar",
             "Lugia", "Ho-Oh", "Celebi", "Blaziken", "Gardevoir", "Absol",
-            "Salamence", "Metagross", "Latias", "Latios", "Kyogre", "Groudon",
-            "Rayquaza", "Jirachi", "Piplup", "Bidoof", "Garchomp", "Lucario",
+            "Salamence", "Metagross", "Shiny Metagross", "Latias", "Latios", "Kyogre", "Groudon",
+            "Rayquaza", "Shiny Rayquaza", "Jirachi", "Piplup", "Bidoof", "Garchomp", "Lucario",
             "Leafeon", "Glaceon", "Dialga", "Palkia", "Giratina", "Darkrai",
             "Arceus", "Trubbish", "Zorua", "Zoroark", "Chandelure", "Zekrom",
             "Greninja", "Sylveon", "Mimikyu", "Dragapult", "Ceruledge", "Tinkaton",
@@ -47,7 +47,7 @@ const CONFIG = {
         ],
         mega: [
             "Mega Charizard X", "Mega Charizard Y", "Mega Blastoise", "Mega Raichu X",
-            "Mega Raichu Y", "Mega Gengar", "Mega Rayquaza", "Mega Lucario"
+            "Mega Raichu Y", "Mega Gengar", "Mega Rayquaza", "Shiny Mega Rayquaza", "Mega Lucario"
         ],
         special: [
             "Ash Greninja"
@@ -101,6 +101,11 @@ const CONFIG = {
         "Pikachu": "https://i.imgur.com/eOUEimi.jpeg",
         "Pichu": "https://i.imgur.com/frd6yed.png",
         "Gyarados": "https://i.imgur.com/EZlSIeM.png",
-        "Wartortle": "https://i.imgur.com/Y2Ty1iP.png"
+        "Wartortle": "https://i.imgur.com/Y2Ty1iP.png",
+        "Shiny Raquaza": "https://i.imgur.com/cp5j8qp.png",
+        "Shiny Gyarados": "https://i.imgur.com/O6XENFn.png",
+        "Shiny Metagross": "https://i.imgur.com/jwx4AXx.png",
+        "Charmander": "https://i.imgur.com/Q1UBK4m.png",
+        "Female Pikachu": "https://i.imgur.com/jnf3hqX.png"
     }
 };
