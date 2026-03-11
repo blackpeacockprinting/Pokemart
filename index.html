@@ -1167,92 +1167,93 @@
     </div>
 
     <script>
+        // DUAL TYPE POKEMON - Fixed to show both types
         const pokemonTypes = {
-            "Bulbasaur": "grass", "Ivysaur": "grass", "Venusaur": "grass",
-            "Charmander": "fire", "Charmeleon": "fire", "Charizard": "fire",
-            "Squirtle": "water", "Wartortle": "water", "Blastoise": "water",
-            "Caterpie": "bug", "Metapod": "bug", "Butterfree": "bug",
-            "Weedle": "bug", "Kakuna": "bug", "Beedrill": "bug",
-            "Pidgey": "normal", "Pidgeotto": "normal", "Pidgeot": "normal",
-            "Rattata": "normal", "Raticate": "normal",
-            "Spearow": "normal", "Fearow": "normal",
-            "Ekans": "poison", "Arbok": "poison",
-            "Pikachu": "electric", "Female Pikachu": "electric", "Raichu": "electric",
-            "Sandshrew": "ground", "Sandslash": "ground",
-            "Nidoran♀": "poison", "Nidorina": "poison", "Nidoqueen": "poison",
-            "Nidoran♂": "poison", "Nidorino": "poison", "Nidoking": "poison",
-            "Clefairy": "fairy", "Clefable": "fairy",
-            "Vulpix": "fire", "Ninetales": "fire",
-            "Jigglypuff": "fairy", "Wigglytuff": "fairy",
-            "Zubat": "poison", "Golbat": "poison",
-            "Oddish": "grass", "Gloom": "grass", "Vileplume": "grass",
-            "Paras": "bug", "Parasect": "bug",
-            "Venonat": "bug", "Venomoth": "bug",
-            "Diglett": "ground", "Dugtrio": "ground",
-            "Meowth": "normal", "Persian": "normal",
-            "Psyduck": "water", "Golduck": "water",
-            "Mankey": "fighting", "Primeape": "fighting",
-            "Growlithe": "fire", "Arcanine": "fire",
-            "Poliwag": "water", "Poliwhirl": "water", "Poliwrath": "water",
-            "Abra": "psychic", "Kadabra": "psychic", "Alakazam": "psychic",
-            "Machop": "fighting", "Machoke": "fighting", "Machamp": "fighting",
-            "Bellsprout": "grass", "Weepinbell": "grass", "Victreebel": "grass",
-            "Ponyta": "fire",
-            "Magnetite": "electric", "Magneton": "electric",
-            "Grimer": "poison", "Muk": "poison",
-            "Shellder": "water", "Cloyster": "water",
-            "Gastly": "ghost", "Haunter": "ghost", "Gengar": "ghost",
-            "Onix": "rock",
-            "Krabby": "water", "Kingler": "water",
-            "Voltorb": "electric", "Electrode": "electric",
-            "Exeggcute": "grass", "Exeggutor": "grass",
-            "Cubone": "ground", "Marowak": "ground",
-            "Koffing": "poison", "Weezing": "poison",
-            "Chansey": "normal", "Kangaskhan": "normal",
-            "Horsea": "water", "Seadra": "water",
-            "Staryu": "water", "Starmie": "water",
-            "Scyther": "bug", "Electabuzz": "electric",
-            "Pinsir": "bug", "Tauros": "normal",
-            "Magikarp": "water", "Gyarados": "water", "Shiny Gyarados": "water",
-            "Lapras": "water", "Ditto": "normal",
-            "Eevee": "normal", "Vaporeon": "water", "Jolteon": "electric", "Flareon": "fire",
-            "Snorlax": "normal",
-            "Articuno": "ice", "Zapdos": "electric", "Moltres": "fire",
-            "Dratini": "dragon", "Dragonair": "dragon", "Dragonite": "dragon",
-            "Mewtwo": "psychic", "Mew": "psychic",
-            "Chikorita": "grass", "Cyndaquil": "fire", "Totodile": "water",
-            "Furret": "normal", "Pichu": "electric", "Togepi": "fairy", "Wooper": "water",
-            "Espeon": "psychic", "Umbreon": "dark",
-            "Raikou": "electric", "Entei": "fire", "Suicune": "water",
-            "Tyranitar": "rock",
-            "Lugia": "psychic", "Ho-Oh": "fire", "Celebi": "grass",
-            "Blaziken": "fire", "Gardevoir": "psychic", "Absol": "dark",
-            "Salamence": "dragon", "Metagross": "steel", "Shiny Metagross": "steel",
-            "Latias": "dragon", "Latios": "dragon",
-            "Kyogre": "water", "Groudon": "ground",
-            "Rayquaza": "dragon", "Shiny Rayquaza": "dragon",
-            "Jirachi": "steel",
-            "Piplup": "water", "Bidoof": "normal",
-            "Garchomp": "dragon", "Lucario": "fighting",
-            "Leafeon": "grass", "Glaceon": "ice",
-            "Dialga": "steel", "Palkia": "water", "Giratina": "ghost",
-            "Darkrai": "dark", "Arceus": "normal",
-            "Trubbish": "poison", "Zorua": "dark", "Zoroark": "dark",
-            "Chandelure": "ghost", "Zekrom": "dragon",
-            "Greninja": "water", "Sylveon": "fairy",
-            "Mimikyu": "ghost", "Dragapult": "dragon", "Ceruledge": "fire", "Tinkaton": "fairy",
-            "Deoxys": "psychic",
-            "Mega Charizard X": "fire", "Mega Charizard Y": "fire",
-            "Mega Blastoise": "water",
-            "Mega Raichu X": "electric", "Mega Raichu Y": "electric",
-            "Mega Gengar": "ghost",
-            "Mega Rayquaza": "dragon", "Shiny Mega Rayquaza": "dragon",
-            "Mega Lucario": "fighting",
-            "Ash Greninja": "water",
-            "Galarian Ponyta": "psychic",
-            "Halloween Bulbasaur": "grass",
-            "Christmas Bulbasaur": "grass",
-            "Love Bulbasaur": "grass"
+            "Bulbasaur": ["grass", "poison"], "Ivysaur": ["grass", "poison"], "Venusaur": ["grass", "poison"],
+            "Charmander": ["fire"], "Charmeleon": ["fire"], "Charizard": ["fire", "flying"],
+            "Squirtle": ["water"], "Wartortle": ["water"], "Blastoise": ["water"],
+            "Caterpie": ["bug"], "Metapod": ["bug"], "Butterfree": ["bug", "flying"],
+            "Weedle": ["bug", "poison"], "Kakuna": ["bug", "poison"], "Beedrill": ["bug", "poison"],
+            "Pidgey": ["normal", "flying"], "Pidgeotto": ["normal", "flying"], "Pidgeot": ["normal", "flying"],
+            "Rattata": ["normal"], "Raticate": ["normal"],
+            "Spearow": ["normal", "flying"], "Fearow": ["normal", "flying"],
+            "Ekans": ["poison"], "Arbok": ["poison"],
+            "Pikachu": ["electric"], "Female Pikachu": ["electric"], "Raichu": ["electric"],
+            "Sandshrew": ["ground"], "Sandslash": ["ground"],
+            "Nidoran♀": ["poison"], "Nidorina": ["poison"], "Nidoqueen": ["poison", "ground"],
+            "Nidoran♂": ["poison"], "Nidorino": ["poison"], "Nidoking": ["poison", "ground"],
+            "Clefairy": ["fairy"], "Clefable": ["fairy"],
+            "Vulpix": ["fire"], "Ninetales": ["fire"],
+            "Jigglypuff": ["normal", "fairy"], "Wigglytuff": ["normal", "fairy"],
+            "Zubat": ["poison", "flying"], "Golbat": ["poison", "flying"],
+            "Oddish": ["grass", "poison"], "Gloom": ["grass", "poison"], "Vileplume": ["grass", "poison"],
+            "Paras": ["bug", "grass"], "Parasect": ["bug", "grass"],
+            "Venonat": ["bug", "poison"], "Venomoth": ["bug", "poison"],
+            "Diglett": ["ground"], "Dugtrio": ["ground"],
+            "Meowth": ["normal"], "Persian": ["normal"],
+            "Psyduck": ["water"], "Golduck": ["water"],
+            "Mankey": ["fighting"], "Primeape": ["fighting"],
+            "Growlithe": ["fire"], "Arcanine": ["fire"],
+            "Poliwag": ["water"], "Poliwhirl": ["water"], "Poliwrath": ["water", "fighting"],
+            "Abra": ["psychic"], "Kadabra": ["psychic"], "Alakazam": ["psychic"],
+            "Machop": ["fighting"], "Machoke": ["fighting"], "Machamp": ["fighting"],
+            "Bellsprout": ["grass", "poison"], "Weepinbell": ["grass", "poison"], "Victreebel": ["grass", "poison"],
+            "Ponyta": ["fire"],
+            "Magnetite": ["electric"], "Magneton": ["electric"],
+            "Grimer": ["poison"], "Muk": ["poison"],
+            "Shellder": ["water"], "Cloyster": ["water", "ice"],
+            "Gastly": ["ghost", "poison"], "Haunter": ["ghost", "poison"], "Gengar": ["ghost", "poison"],
+            "Onix": ["rock", "ground"],
+            "Krabby": ["water"], "Kingler": ["water"],
+            "Voltorb": ["electric"], "Electrode": ["electric"],
+            "Exeggcute": ["grass", "psychic"], "Exeggutor": ["grass", "psychic"],
+            "Cubone": ["ground"], "Marowak": ["ground"],
+            "Koffing": ["poison"], "Weezing": ["poison"],
+            "Chansey": ["normal"], "Kangaskhan": ["normal"],
+            "Horsea": ["water"], "Seadra": ["water"],
+            "Staryu": ["water"], "Starmie": ["water", "psychic"],
+            "Scyther": ["bug", "flying"], "Electabuzz": ["electric"],
+            "Pinsir": ["bug"], "Tauros": ["normal"],
+            "Magikarp": ["water"], "Gyarados": ["water", "flying"], "Shiny Gyarados": ["water", "flying"],
+            "Lapras": ["water", "ice"], "Ditto": ["normal"],
+            "Eevee": ["normal"], "Vaporeon": ["water"], "Jolteon": ["electric"], "Flareon": ["fire"],
+            "Snorlax": ["normal"],
+            "Articuno": ["ice", "flying"], "Zapdos": ["electric", "flying"], "Moltres": ["fire", "flying"],
+            "Dratini": ["dragon"], "Dragonair": ["dragon"], "Dragonite": ["dragon", "flying"],
+            "Mewtwo": ["psychic"], "Mew": ["psychic"],
+            "Chikorita": ["grass"], "Cyndaquil": ["fire"], "Totodile": ["water"],
+            "Furret": ["normal"], "Pichu": ["electric"], "Togepi": ["fairy"], "Wooper": ["water", "ground"],
+            "Espeon": ["psychic"], "Umbreon": ["dark"],
+            "Raikou": ["electric"], "Entei": ["fire"], "Suicune": ["water"],
+            "Tyranitar": ["rock", "dark"],
+            "Lugia": ["psychic", "flying"], "Ho-Oh": ["fire", "flying"], "Celebi": ["psychic", "grass"],
+            "Blaziken": ["fire", "fighting"], "Gardevoir": ["psychic", "fairy"], "Absol": ["dark"],
+            "Salamence": ["dragon", "flying"], "Metagross": ["steel", "psychic"], "Shiny Metagross": ["steel", "psychic"],
+            "Latias": ["dragon", "psychic"], "Latios": ["dragon", "psychic"],
+            "Kyogre": ["water"], "Groudon": ["ground"],
+            "Rayquaza": ["dragon", "flying"], "Shiny Rayquaza": ["dragon", "flying"],
+            "Jirachi": ["steel", "psychic"],
+            "Piplup": ["water"], "Bidoof": ["normal"],
+            "Garchomp": ["dragon", "ground"], "Lucario": ["fighting", "steel"],
+            "Leafeon": ["grass"], "Glaceon": ["ice"],
+            "Dialga": ["steel", "dragon"], "Palkia": ["water", "dragon"], "Giratina": ["ghost", "dragon"],
+            "Darkrai": ["dark"], "Arceus": ["normal"],
+            "Trubbish": ["poison"], "Zorua": ["dark"], "Zoroark": ["dark"],
+            "Chandelure": ["ghost", "fire"], "Zekrom": ["dragon", "electric"],
+            "Greninja": ["water", "dark"], "Sylveon": ["fairy"],
+            "Mimikyu": ["ghost", "fairy"], "Dragapult": ["dragon", "ghost"], "Ceruledge": ["fire", "ghost"], "Tinkaton": ["fairy", "steel"],
+            "Deoxys": ["psychic"],
+            "Mega Charizard X": ["fire", "dragon"], "Mega Charizard Y": ["fire", "flying"],
+            "Mega Blastoise": ["water"],
+            "Mega Raichu X": ["electric"], "Mega Raichu Y": ["electric"],
+            "Mega Gengar": ["ghost", "poison"],
+            "Mega Rayquaza": ["dragon", "flying"], "Shiny Mega Rayquaza": ["dragon", "flying"],
+            "Mega Lucario": ["fighting", "steel"],
+            "Ash Greninja": ["water", "dark"],
+            "Galarian Ponyta": ["psychic"],
+            "Halloween Bulbasaur": ["grass", "poison"],
+            "Christmas Bulbasaur": ["grass", "poison"],
+            "Love Bulbasaur": ["grass", "poison"]
         };
         
         let cart = {};
@@ -1310,6 +1311,7 @@
             });
         }
         
+        // FIXED: Now shows dual types properly
         function renderProducts() {
             Object.keys(CONFIG.pokemon).forEach(category => {
                 const grid = document.getElementById(`${category}-grid`);
@@ -1317,15 +1319,29 @@
                 
                 grid.innerHTML = CONFIG.pokemon[category].map(name => {
                     const imageUrl = CONFIG.images[name];
-                    const type = pokemonTypes[name] || 'normal';
-                    const typeClass = `type-${type}`;
+                    const types = pokemonTypes[name] || ['normal'];
+                    const primaryType = Array.isArray(types) ? types[0] : types;
                     const isWishlisted = wishlist.includes(name);
                     
-                    let cardHtml = `<div class="product-card" data-name="${name}" data-category="${category}" data-price="${price}" data-type="${type}">`;
+                    // Create type badges for all types
+                    let typeBadgesHtml = '';
+                    if (Array.isArray(types)) {
+                        // Multiple types - show both badges in top right
+                        typeBadgesHtml = `<div style="position: absolute; top: 10px; right: 10px; z-index: 2; display: flex; gap: 5px;">`;
+                        types.forEach(t => {
+                            typeBadgesHtml += `<span class="type-badge type-${t}">${t}</span>`;
+                        });
+                        typeBadgesHtml += `</div>`;
+                    } else {
+                        // Single type
+                        typeBadgesHtml = `<span class="type-badge type-${types}">${types}</span>`;
+                    }
+                    
+                    let cardHtml = `<div class="product-card" data-name="${name}" data-category="${category}" data-price="${price}" data-type="${primaryType}">`;
                     
                     cardHtml += `<button class="wishlist-btn ${isWishlisted ? 'active' : ''}" onclick="toggleWishlist('${name}', event)">❤</button>`;
                     
-                    cardHtml += `<span class="type-badge ${typeClass}">${type}</span>`;
+                    cardHtml += typeBadgesHtml;
                     
                     if (imageUrl) {
                         cardHtml += `
@@ -1500,7 +1516,7 @@
             alert(`Added Mystery ${name} to cart!`);
         }
         
-        // Bundle Functions
+        // FIXED: Bundle savings calculation
         function renderBundles() {
             const grid = document.getElementById('bundleGrid');
             grid.innerHTML = Object.entries(CONFIG.bundles).map(([name, data]) => {
@@ -1512,13 +1528,13 @@
                 
                 return `
                     <div class="bundle-card" onclick="selectBundle('${name}')">
-                        <span class="savings">Save $${savings}!</span>
+                        ${savings > 0 ? `<span class="savings">Save $${savings}!</span>` : ''}
                         <h3>${name}</h3>
                         <div class="bundle-contents">
                             ${data.items.map(item => `• ${item}`).join('<br>')}
                         </div>
                         <div style="font-size: 1.3rem; color: #ffd700; font-weight: bold; margin-top: 10px;">
-                            $${data.price} <small style="text-decoration: line-through; color: rgba(255,255,255,0.5); font-size: 0.8em;">$${regularPrice}</small>
+                            $${data.price} ${regularPrice > data.price ? `<small style="text-decoration: line-through; color: rgba(255,255,255,0.5); font-size: 0.8em;">$${regularPrice}</small>` : ''}
                         </div>
                         <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-top: 5px;">${data.description}</p>
                     </div>
@@ -1599,7 +1615,6 @@
             });
         }
         
-        // Existing functions
         function filterByType(type) {
             document.querySelectorAll('.type-btn').forEach(btn => {
                 btn.classList.remove('active');
