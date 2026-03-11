@@ -5,18 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poké Mart - Local Order Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* Theme Variables */
         :root {
             --bg-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             --bg-light: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 50%, #d0d0d0 100%);
             --text-dark: #fff;
             --text-light: #1a1a2e;
-            --card-bg-dark: rgba(255,255,255,0.1);
-            --card-bg-light: rgba(255,255,255,0.8);
         }
         
         body { 
@@ -35,7 +33,6 @@
         
         .container { max-width: 1400px; margin: 0 auto; }
         
-        /* Floating Pokéball Background */
         .floating-pokeballs {
             position: fixed;
             top: 0;
@@ -78,7 +75,6 @@
             100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
         
-        /* Loading Animation */
         .loader {
             position: fixed;
             top: 0;
@@ -126,7 +122,6 @@
             50% { opacity: 0.5; }
         }
         
-        /* Header */
         .header { 
             text-align: center; 
             margin-bottom: 40px; 
@@ -190,48 +185,306 @@
             text-transform: uppercase; letter-spacing: 2px; 
         }
         
-        /* Recently Caught Section */
-        .recently-caught {
-            background: rgba(255,215,0,0.1);
-            border: 2px solid #ffd700;
+        /* Team Builder Styles */
+        .team-builder {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,0,0,0.1) 100%);
+            border: 3px solid #ffd700;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .team-slots {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .team-slot {
+            width: 80px;
+            height: 80px;
+            border: 3px dashed rgba(255,255,255,0.3);
             border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .team-slot:hover {
+            border-color: #ffd700;
+            background: rgba(255,215,0,0.1);
+        }
+        
+        .team-slot.filled {
+            border-style: solid;
+            border-color: #00aa00;
+            background: rgba(0,170,0,0.2);
+        }
+        
+        .team-slot .slot-number {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .team-slot .remove-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: none;
+            font-size: 0.9rem;
+        }
+        
+        .team-slot.filled:hover .remove-btn {
+            display: block;
+        }
+        
+        .team-discount {
+            background: rgba(0,170,0,0.2);
+            border: 2px solid #00aa00;
+            border-radius: 10px;
             padding: 15px;
-            margin-bottom: 20px;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .team-discount.active {
+            background: rgba(0,170,0,0.4);
+            animation: glow 2s infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0,170,0,0.5); }
+            50% { box-shadow: 0 0 20px rgba(0,170,0,0.8); }
+        }
+        
+        /* Mystery Ball Styles */
+        .mystery-section {
+            background: linear-gradient(135deg, rgba(138,43,226,0.2) 0%, rgba(255,0,255,0.2) 100%);
+            border: 3px solid #8a2be2;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
             text-align: center;
             position: relative;
             z-index: 1;
         }
         
-        .recently-caught h3 {
-            font-family: 'Exo 2', sans-serif;
-            color: #ffd700;
-            margin-bottom: 10px;
-            font-size: 1rem;
+        .mystery-ball {
+            width: 120px;
+            height: 120px;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #8a2be2 0%, #ff00ff 50%, #8a2be2 100%);
+            border-radius: 50%;
+            border: 5px solid #000;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: mysteryFloat 3s ease-in-out infinite;
         }
         
-        .recent-list {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
+        @keyframes mysteryFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
-        .recent-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .mystery-ball:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(138,43,226,0.8);
+        }
+        
+        .mystery-ball::before {
+            content: '?';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .mystery-ball.shaking {
+            animation: shakeBall 0.5s infinite;
+        }
+        
+        @keyframes shakeBall {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        .mystery-result {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+        }
+        
+        .mystery-result.revealed {
+            display: block;
+            animation: revealPop 0.5s ease;
+        }
+        
+        @keyframes revealPop {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .rarity-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+        
+        /* Bundle Builder Styles */
+        .bundle-section {
+            background: linear-gradient(135deg, rgba(0,191,255,0.1) 0%, rgba(30,144,255,0.1) 100%);
+            border: 3px solid #00bfff;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .bundle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .bundle-card {
             background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .bundle-card:hover {
+            transform: translateY(-5px);
+            border-color: #00bfff;
+            box-shadow: 0 10px 30px rgba(0,191,255,0.3);
+        }
+        
+        .bundle-card.selected {
+            border-color: #00bfff;
+            background: rgba(0,191,255,0.2);
+        }
+        
+        .bundle-card .savings {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #00aa00;
+            color: white;
             padding: 5px 10px;
             border-radius: 20px;
+            font-weight: bold;
             font-size: 0.9rem;
         }
         
-        .recent-ball {
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(to bottom, #ff0000 0%, #ff0000 45%, #000 45%, #000 55%, #fff 55%, #fff 100%);
+        .bundle-contents {
+            margin: 15px 0;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        /* Share & Save Styles */
+        .share-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .share-btn {
+            padding: 10px 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .share-btn:hover {
+            background: #ffd700;
+            border-color: #ffd700;
+            color: #000;
+        }
+        
+        #qrcode {
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            display: none;
+            text-align: center;
+        }
+        
+        #qrcode.active {
+            display: block;
+        }
+        
+        /* Wishlist Styles */
+        .wishlist-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .wishlist-btn:hover, .wishlist-btn.active {
+            color: #ff0066;
+            transform: scale(1.2);
         }
         
         /* Cart Summary */
@@ -280,7 +533,6 @@
             font-size: 1.1rem; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; 
         }
         
-        /* Sticky Cart for Mobile */
         @media (max-width: 768px) {
             .cart-summary {
                 position: fixed;
@@ -338,7 +590,6 @@
             border-color: rgba(0,0,0,0.2);
         }
         
-        /* Autocomplete */
         .autocomplete-items {
             position: absolute;
             top: 100%;
@@ -388,7 +639,6 @@
             border-color: #ff0000; 
         }
         
-        /* Type Filter */
         .type-filter {
             display: flex;
             gap: 8px;
@@ -486,7 +736,7 @@
             border-color: rgba(0,0,0,0.1);
         }
         
-        /* Type Glow Effect */
+        /* Type Glow Effects */
         .product-card[data-type="fire"]:hover { 
             box-shadow: 0 0 30px rgba(240, 128, 48, 0.6); 
             border-color: #f08030;
@@ -569,7 +819,6 @@
             background: rgba(255,215,0,0.15); 
         }
         
-        /* Type Badge */
         .type-badge {
             position: absolute;
             top: 10px;
@@ -724,7 +973,6 @@
         
         .submit-order:hover { background: #ff6b6b; }
         
-        /* Success Message */
         .success-message { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             background: #00aa00; padding: 30px 50px; border-radius: 15px; text-align: center; 
@@ -746,17 +994,17 @@
             .product-grid { grid-template-columns: 1fr; }
             .controls { flex-direction: column; }
             .theme-toggle { position: relative; margin-bottom: 10px; }
+            .team-slots { gap: 10px; }
+            .team-slot { width: 60px; height: 60px; }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
     <div class="loader" id="loader">
         <div class="loader-ball"></div>
         <div class="loader-text">Catching Pokémon...</div>
     </div>
     
-    <!-- Floating Background -->
     <div class="floating-pokeballs" id="floatingBalls"></div>
     
     <div class="container">
@@ -770,14 +1018,47 @@
             <div class="local-badge">🌟 Local Pickup Only</div>
         </header>
         
-        <!-- Recently Caught -->
-        <div class="recently-caught">
-            <h3>🔥 Recently Caught</h3>
-            <div class="recent-list" id="recentList">
-                <div class="recent-item"><div class="recent-ball"></div>Charizard x3</div>
-                <div class="recent-item"><div class="recent-ball"></div>Pikachu x5</div>
-                <div class="recent-item"><div class="recent-ball"></div>Gengar x2</div>
+        <!-- Team Builder -->
+        <div class="team-builder">
+            <h2 class="section-title"><span class="section-icon">🎯</span> Team Builder <small style="font-size: 0.6em; color: #ffd700;">(Build a team of 6 for 15% off!)</small></h2>
+            <div class="team-slots" id="teamSlots"></div>
+            <div class="team-discount" id="teamDiscount">
+                <span id="teamCount">0</span>/6 Pokémon selected
+                <div id="teamSavings" style="display: none; margin-top: 10px; color: #00ff00; font-weight: bold;">
+                    🎉 Team Discount Activated! Save 15% on these 6 items!
+                </div>
             </div>
+        </div>
+        
+        <!-- Mystery Ball -->
+        <div class="mystery-section">
+            <h2 class="section-title"><span class="section-icon">❓</span> Mystery Pokéball <small style="font-size: 0.6em; color: #8a2be2;">Only $6!</small></h2>
+            <p>Try your luck! Get a random Pokéball at a discount. Rarities: Common (50%), Uncommon (30%), Rare (15%), Legendary (5%)</p>
+            <div class="mystery-ball" id="mysteryBall" onclick="openMysteryBall()"></div>
+            <button class="add-to-cart" onclick="addMysteryToCart()" style="background: #8a2be2; max-width: 200px; margin: 0 auto; display: block;">Buy Mystery Ball ($6)</button>
+            
+            <div class="mystery-result" id="mysteryResult">
+                <h3 id="mysteryPokemon"></h3>
+                <div id="mysteryImage"></div>
+                <div class="rarity-badge" id="rarityBadge"></div>
+                <p id="mysteryValue"></p>
+            </div>
+        </div>
+        
+        <!-- Share & Save -->
+        <div class="share-section">
+            <button class="share-btn" onclick="saveWishlist()">💾 Save Wishlist</button>
+            <button class="share-btn" onclick="shareCart()">🔗 Share Cart</button>
+            <button class="share-btn" onclick="generateQR()">📱 QR Code</button>
+            <button class="share-btn" onclick="copyOrder()">📋 Copy Order</button>
+        </div>
+        <div id="qrcode"></div>
+        
+        <!-- Bundle Deals -->
+        <div class="bundle-section">
+            <h2 class="section-title"><span class="section-icon">📦</span> Bundle Deals</h2>
+            <p>Pre-made bundles with special discounts!</p>
+            <div class="bundle-grid" id="bundleGrid"></div>
         </div>
         
         <div class="cart-summary">
@@ -886,7 +1167,6 @@
     </div>
 
     <script>
-        // Pokémon Type Data
         const pokemonTypes = {
             "Bulbasaur": "grass", "Ivysaur": "grass", "Venusaur": "grass",
             "Charmander": "fire", "Charmeleon": "fire", "Charizard": "fire",
@@ -976,18 +1256,18 @@
         };
         
         let cart = {};
+        let team = [];
+        let wishlist = JSON.parse(localStorage.getItem('pokemart_wishlist') || '[]');
         let currentTypeFilter = 'all';
+        let lastMysteryResult = null;
         
         function init() {
-            // Create floating pokeballs
             createFloatingBalls();
             
-            // Hide loader after 2 seconds
             setTimeout(() => {
                 document.getElementById('loader').classList.add('hidden');
             }, 2000);
             
-            // Update prices
             document.getElementById('price-standard').textContent = CONFIG.pricing.standard;
             document.getElementById('price-mega').textContent = CONFIG.pricing.mega;
             document.getElementById('price-special').textContent = CONFIG.pricing.special;
@@ -998,11 +1278,11 @@
             document.getElementById('section-price-special').textContent = CONFIG.pricing.special;
             document.getElementById('section-price-event').textContent = CONFIG.pricing.event;
             
-            // Create type filter buttons
             createTypeFilters();
-            
-            // Render products
             renderProducts();
+            initTeamBuilder();
+            renderBundles();
+            loadCartFromURL();
         }
         
         function createFloatingBalls() {
@@ -1039,13 +1319,14 @@
                     const imageUrl = CONFIG.images[name];
                     const type = pokemonTypes[name] || 'normal';
                     const typeClass = `type-${type}`;
+                    const isWishlisted = wishlist.includes(name);
                     
                     let cardHtml = `<div class="product-card" data-name="${name}" data-category="${category}" data-price="${price}" data-type="${type}">`;
                     
-                    // Type badge
+                    cardHtml += `<button class="wishlist-btn ${isWishlisted ? 'active' : ''}" onclick="toggleWishlist('${name}', event)">❤</button>`;
+                    
                     cardHtml += `<span class="type-badge ${typeClass}">${type}</span>`;
                     
-                    // Image
                     if (imageUrl) {
                         cardHtml += `
                             <div class="product-image">
@@ -1054,7 +1335,6 @@
                         `;
                     }
                     
-                    // Info
                     cardHtml += `
                         <div class="product-header">
                             ${!imageUrl ? '<div class="product-ball"></div>' : ''}
@@ -1070,6 +1350,7 @@
                             <button class="qty-btn" onclick="updateQuantity('${name}', 1)">+</button>
                         </div>
                         <button class="add-to-cart" id="btn-${name.replace(/\s+/g, '-')}" onclick="addToCart('${name}', ${price})">Add to Cart</button>
+                        <button class="add-to-cart" style="margin-top: 5px; background: #0066cc;" onclick="addToTeam('${name}')">Add to Team</button>
                     </div>
                     `;
                     
@@ -1078,8 +1359,248 @@
             });
         }
         
+        // Team Builder Functions
+        function initTeamBuilder() {
+            const container = document.getElementById('teamSlots');
+            container.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'team-slot';
+                slot.dataset.index = i;
+                slot.innerHTML = `<span class="slot-number">${i + 1}</span><span style="font-size: 2rem;">+</span>`;
+                slot.onclick = () => {
+                    if (team[i]) removeFromTeam(i);
+                };
+                container.appendChild(slot);
+            }
+        }
+        
+        function addToTeam(name) {
+            if (team.length >= 6) {
+                alert('Team is full! Remove a Pokémon first.');
+                return;
+            }
+            if (team.includes(name)) {
+                alert('This Pokémon is already on your team!');
+                return;
+            }
+            team.push(name);
+            updateTeamDisplay();
+        }
+        
+        function removeFromTeam(index) {
+            team.splice(index, 1);
+            updateTeamDisplay();
+        }
+        
+        function updateTeamDisplay() {
+            const slots = document.querySelectorAll('.team-slot');
+            slots.forEach((slot, i) => {
+                if (team[i]) {
+                    slot.classList.add('filled');
+                    slot.innerHTML = `
+                        <span class="slot-number">${i + 1}</span>
+                        <button class="remove-btn" onclick="event.stopPropagation(); removeFromTeam(${i})">×</button>
+                        <div style="font-size: 0.7rem; text-align: center;">${team[i]}</div>
+                    `;
+                } else {
+                    slot.classList.remove('filled');
+                    slot.innerHTML = `<span class="slot-number">${i + 1}</span><span style="font-size: 2rem;">+</span>`;
+                }
+            });
+            
+            document.getElementById('teamCount').textContent = team.length;
+            const discountDiv = document.getElementById('teamDiscount');
+            const savingsDiv = document.getElementById('teamSavings');
+            
+            if (team.length === 6) {
+                discountDiv.classList.add('active');
+                savingsDiv.style.display = 'block';
+                addTeamToCart();
+            } else {
+                discountDiv.classList.remove('active');
+                savingsDiv.style.display = 'none';
+            }
+        }
+        
+        function addTeamToCart() {
+            team.forEach(name => {
+                const category = findPokemonCategory(name);
+                const basePrice = CONFIG.pricing[category] || 8;
+                const discountedPrice = Math.round(basePrice * (1 - CONFIG.pricing.teamDiscount));
+                cart[name] = { quantity: 1, price: discountedPrice, isTeam: true };
+            });
+            updateCartDisplay();
+        }
+        
+        function findPokemonCategory(name) {
+            for (let cat in CONFIG.pokemon) {
+                if (CONFIG.pokemon[cat].includes(name)) return cat;
+            }
+            return 'standard';
+        }
+        
+        // Mystery Ball Functions
+        function openMysteryBall() {
+            const ball = document.getElementById('mysteryBall');
+            const result = document.getElementById('mysteryResult');
+            
+            ball.classList.add('shaking');
+            result.classList.remove('revealed');
+            
+            setTimeout(() => {
+                ball.classList.remove('shaking');
+                revealMystery();
+            }, 2000);
+        }
+        
+        function revealMystery() {
+            const rand = Math.random();
+            let tier = 'common';
+            let cumulative = 0;
+            
+            for (let [t, data] of Object.entries(CONFIG.mysteryTiers)) {
+                cumulative += data.chance;
+                if (rand <= cumulative) {
+                    tier = t;
+                    break;
+                }
+            }
+            
+            const allPokemon = Object.values(CONFIG.pokemon).flat();
+            const randomPokemon = allPokemon[Math.floor(Math.random() * allPokemon.length)];
+            const category = findPokemonCategory(randomPokemon);
+            const basePrice = CONFIG.pricing[category] || 8;
+            const value = Math.round(basePrice * CONFIG.mysteryTiers[tier].multiplier);
+            
+            lastMysteryResult = { name: randomPokemon, tier, value };
+            
+            document.getElementById('mysteryPokemon').textContent = randomPokemon;
+            document.getElementById('rarityBadge').textContent = tier;
+            document.getElementById('rarityBadge').style.background = CONFIG.mysteryTiers[tier].color;
+            document.getElementById('rarityBadge').style.color = tier === 'legendary' ? '#000' : '#fff';
+            document.getElementById('mysteryValue').textContent = `Value: $${value} (You paid $${CONFIG.pricing.mystery}!)`;
+            
+            const imageUrl = CONFIG.images[randomPokemon];
+            document.getElementById('mysteryImage').innerHTML = imageUrl ? 
+                `<img src="${imageUrl}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 10px;">` : 
+                '<div class="product-ball" style="width: 100px; height: 100px; margin: 0 auto;"></div>';
+            
+            document.getElementById('mysteryResult').classList.add('revealed');
+        }
+        
+        function addMysteryToCart() {
+            if (!lastMysteryResult) {
+                alert('Open a mystery ball first!');
+                return;
+            }
+            const { name, value } = lastMysteryResult;
+            cart[`Mystery: ${name}`] = { quantity: 1, price: CONFIG.pricing.mystery, actualValue: value };
+            updateCartDisplay();
+            alert(`Added Mystery ${name} to cart!`);
+        }
+        
+        // Bundle Functions
+        function renderBundles() {
+            const grid = document.getElementById('bundleGrid');
+            grid.innerHTML = Object.entries(CONFIG.bundles).map(([name, data]) => {
+                const regularPrice = data.items.reduce((sum, item) => {
+                    const cat = findPokemonCategory(item);
+                    return sum + (CONFIG.pricing[cat] || 8);
+                }, 0);
+                const savings = regularPrice - data.price;
+                
+                return `
+                    <div class="bundle-card" onclick="selectBundle('${name}')">
+                        <span class="savings">Save $${savings}!</span>
+                        <h3>${name}</h3>
+                        <div class="bundle-contents">
+                            ${data.items.map(item => `• ${item}`).join('<br>')}
+                        </div>
+                        <div style="font-size: 1.3rem; color: #ffd700; font-weight: bold; margin-top: 10px;">
+                            $${data.price} <small style="text-decoration: line-through; color: rgba(255,255,255,0.5); font-size: 0.8em;">$${regularPrice}</small>
+                        </div>
+                        <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-top: 5px;">${data.description}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function selectBundle(bundleName) {
+            const bundle = CONFIG.bundles[bundleName];
+            bundle.items.forEach(item => {
+                cart[item] = { quantity: 1, price: Math.round(bundle.price / bundle.items.length), isBundle: true };
+            });
+            updateCartDisplay();
+            alert(`Added ${bundleName} to cart!`);
+        }
+        
+        // Share & Save Functions
+        function saveWishlist() {
+            localStorage.setItem('pokemart_wishlist', JSON.stringify(wishlist));
+            alert('Wishlist saved! (' + wishlist.length + ' items)');
+        }
+        
+        function toggleWishlist(name, event) {
+            event.stopPropagation();
+            const index = wishlist.indexOf(name);
+            if (index > -1) {
+                wishlist.splice(index, 1);
+            } else {
+                wishlist.push(name);
+            }
+            localStorage.setItem('pokemart_wishlist', JSON.stringify(wishlist));
+            renderProducts();
+        }
+        
+        function shareCart() {
+            const cartData = btoa(JSON.stringify(cart));
+            const url = `${window.location.origin}${window.location.pathname}?cart=${cartData}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Cart link copied to clipboard!');
+            });
+        }
+        
+        function loadCartFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const cartData = params.get('cart');
+            if (cartData) {
+                try {
+                    cart = JSON.parse(atob(cartData));
+                    updateCartDisplay();
+                } catch(e) {}
+            }
+        }
+        
+        function generateQR() {
+            const qrDiv = document.getElementById('qrcode');
+            qrDiv.innerHTML = '';
+            const cartData = btoa(JSON.stringify(cart));
+            const url = `${window.location.origin}${window.location.pathname}?cart=${cartData}`;
+            
+            new QRCode(qrDiv, {
+                text: url,
+                width: 128,
+                height: 128
+            });
+            
+            qrDiv.classList.toggle('active');
+        }
+        
+        function copyOrder() {
+            const items = Object.entries(cart).map(([name, item]) => 
+                `${name} x${item.quantity} - $${(item.quantity * item.price).toFixed(2)}`
+            ).join('\n');
+            const total = Object.values(cart).reduce((sum, item) => sum + (item.quantity * item.price), 0);
+            const text = `My Poké Mart Order:\n${items}\n\nTotal: $${total.toFixed(2)}`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Order copied to clipboard!');
+            });
+        }
+        
+        // Existing functions
         function filterByType(type) {
-            // Toggle active state
             document.querySelectorAll('.type-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.textContent === type) {
@@ -1127,30 +1648,6 @@
             else cart[name] = { quantity: qty, price: price };
             updateCartDisplay();
             document.querySelector(`[data-name="${name}"]`).classList.toggle('selected', qty > 0);
-            
-            // Update recently caught
-            updateRecentlyCaught(name, qty);
-        }
-        
-        function updateRecentlyCaught(name, qty) {
-            if (qty === 0) return;
-            
-            const recentList = document.getElementById('recentList');
-            const existing = Array.from(recentList.children).find(item => item.textContent.includes(name));
-            
-            if (existing) {
-                existing.remove();
-            }
-            
-            const newItem = document.createElement('div');
-            newItem.className = 'recent-item';
-            newItem.innerHTML = `<div class="recent-ball"></div>${name} x${qty}`;
-            recentList.insertBefore(newItem, recentList.firstChild);
-            
-            // Keep only 5 items
-            while (recentList.children.length > 5) {
-                recentList.removeChild(recentList.lastChild);
-            }
         }
         
         function updateCartDisplay() {
@@ -1171,7 +1668,6 @@
         function filterPokemon() {
             applyFilters();
             
-            // Autocomplete
             const search = document.getElementById('searchInput').value.toLowerCase();
             const autocompleteList = document.getElementById('autocompleteList');
             
@@ -1261,7 +1757,6 @@
             return true;
         }
         
-        // Close autocomplete when clicking outside
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.search-box')) {
                 document.getElementById('autocompleteList').style.display = 'none';
