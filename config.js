@@ -137,6 +137,7 @@ const CONFIG = {
         "Shiny Gyarados": "https://i.imgur.com/O6XENFn.png",
         "Shiny Metagross": "https://i.imgur.com/jwx4AXx.png",
         "Charmander": "https://i.imgur.com/Q1UBK4m.png",
-        "Female Pikachu": "https://i.imgur.com/jnf3hqX.png"
+        "Female Pikachu": "https://i.imgur.com/jnf3hqX.png",
+        "Shiny Mega Rayquaza": "https://i.imgur.com/wqK51ei.png"
     }
 };
