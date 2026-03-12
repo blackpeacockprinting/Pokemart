@@ -76,7 +76,7 @@ const CONFIG = {
             "Leafeon", "Glaceon", "Dialga", "Palkia", "Giratina", "Darkrai",
             "Arceus", "Trubbish", "Zorua", "Zoroark", "Chandelure", "Zekrom",
             "Greninja", "Sylveon", "Mimikyu", "Dragapult", "Ceruledge", "Tinkaton",
-            "Deoxys"
+            "Deoxys", "Sprigatito"
         ],
         mega: [
             "Mega Charizard X", "Mega Charizard Y", "Mega Blastoise", "Mega Raichu X",
