@@ -33,7 +33,7 @@
         
         .container { max-width: 1400px; margin: 0 auto; }
         
-        .floating-pokeballs {
+        .floating-pokeballs{
             position: fixed;
             top: 0;
             left: 0;
@@ -295,7 +295,6 @@
             border-radius: 50%;
             border: 5px solid #000;
             position: relative;
-            cursor: pointer;
             transition: all 0.3s;
             animation: mysteryFloat 3s ease-in-out infinite;
         }
@@ -303,11 +302,6 @@
         @keyframes mysteryFloat {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
-        }
-        
-        .mystery-ball:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(138,43,226,0.8);
         }
         
         .mystery-ball::before {
@@ -320,49 +314,6 @@
             font-weight: bold;
             color: white;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        
-        .mystery-ball.shaking {
-            animation: shakeBall 0.5s infinite;
-        }
-        
-        .mystery-ball.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            animation: none;
-        }
-        
-        @keyframes shakeBall {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
-        }
-        
-        .mystery-result {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 15px;
-        }
-        
-        .mystery-result.revealed {
-            display: block;
-            animation: revealPop 0.5s ease;
-        }
-        
-        @keyframes revealPop {
-            0% { transform: scale(0); opacity: 0; }
-            80% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .rarity-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-top: 10px;
         }
         
         /* Bundle Builder Styles */
@@ -1091,20 +1042,14 @@
             </div>
         </div>
         
-        <!-- Mystery Ball - FIXED: No more re-rolls -->
+        <!-- Mystery Ball - Simple purchasable item -->
         <div class="mystery-section">
             <h2 class="section-title"><span class="section-icon">❓</span> Mystery Pokéball <small style="font-size: 0.6em; color: #8a2be2;">Only $6!</small></h2>
-            <p>Try your luck! Click the ball to reveal your Pokémon. You only get ONE reveal per purchase!</p>
-            <div class="mystery-ball" id="mysteryBall" onclick="openMysteryBall()"></div>
-            <button class="add-to-cart" id="mysteryBuyBtn" onclick="addMysteryToCart()" style="background: #8a2be2; max-width: 200px; margin: 0 auto; display: block;">Buy Mystery Ball ($6)</button>
-            
-            <div class="mystery-result" id="mysteryResult">
-                <h3 id="mysteryPokemon"></h3>
-                <div id="mysteryImage"></div>
-                <div class="rarity-badge" id="rarityBadge"></div>
-                <p id="mysteryValue"></p>
-                <p style="color: #ffd700; margin-top: 10px;">Click "Buy Mystery Ball" above to add this to your cart!</p>
-            </div>
+            <p>Receive a random 3D printed Pokéball! Could be any Pokémon from our collection. A fun surprise!</p>
+            <div class="mystery-ball"></div>
+            <button class="add-to-cart" onclick="addMysteryItemToCart()" style="background: #8a2be2; max-width: 200px; margin: 20px auto 0; display: block;">
+                Add Mystery Ball to Cart ($6)
+            </button>
         </div>
         
         <!-- Share & Save -->
@@ -1323,8 +1268,6 @@
         let team = [];
         let wishlist = JSON.parse(localStorage.getItem('pokemart_wishlist') || '[]');
         let currentTypeFilter = 'all';
-        let lastMysteryResult = null;
-        let mysteryRevealed = false; // NEW: Track if mystery ball was already revealed
         
         function init() {
             createFloatingBalls();
@@ -1516,90 +1459,31 @@
             return 'standard';
         }
         
-        // FIXED Mystery Ball - No more re-rolls!
-        function openMysteryBall() {
-            // Prevent multiple reveals
-            if (mysteryRevealed) {
-                alert('You already revealed a Pokémon!');
-                return;
-            }
+        // Simplified Mystery Ball - Just adds item to cart
+        function addMysteryItemToCart() {
+            const mysteryKey = "Mystery Pokéball";
             
-            const ball = document.getElementById('mysteryBall');
-            const result = document.getElementById('mysteryResult');
-            
-            ball.classList.add('shaking');
-            result.classList.remove('revealed');
-            
-            setTimeout(() => {
-                ball.classList.remove('shaking');
-                ball.classList.add('disabled'); // Disable further clicks
-                mysteryRevealed = true;
-                revealMystery();
-            }, 2000);
-        }
-        
-        function revealMystery() {
-            const rand = Math.random();
-            let tier = 'common';
-            let cumulative = 0;
-            
-            for (let [t, data] of Object.entries(CONFIG.mysteryTiers)) {
-                cumulative += data.chance;
-                if (rand <= cumulative) {
-                    tier = t;
-                    break;
-                }
-            }
-            
-            const allPokemon = Object.values(CONFIG.pokemon).flat();
-            const randomPokemon = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-            const category = findPokemonCategory(randomPokemon);
-            const basePrice = CONFIG.pricing[category] || 8;
-            const value = Math.round(basePrice * CONFIG.mysteryTiers[tier].multiplier);
-            
-            lastMysteryResult = { name: randomPokemon, tier, value };
-            
-            document.getElementById('mysteryPokemon').textContent = randomPokemon;
-            document.getElementById('rarityBadge').textContent = tier;
-            document.getElementById('rarityBadge').style.background = CONFIG.mysteryTiers[tier].color;
-            document.getElementById('rarityBadge').style.color = tier === 'legendary' ? '#000' : '#fff';
-            document.getElementById('mysteryValue').textContent = `Value: $${value} (You paid $${CONFIG.pricing.mystery}!)`;
-            
-            const imageUrl = CONFIG.images[randomPokemon];
-            document.getElementById('mysteryImage').innerHTML = imageUrl ? 
-                `<img src="${imageUrl}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 10px;">` : 
-                '<div class="product-ball" style="width: 100px; height: 100px; margin: 0 auto;"></div>';
-            
-            document.getElementById('mysteryResult').classList.add('revealed');
-        }
-        
-        function addMysteryToCart() {
-            if (!lastMysteryResult) {
-                alert('Click the mystery ball first to reveal your Pokémon!');
-                return;
-            }
-            
-            // Check if already added
-            const mysteryKey = `Mystery: ${lastMysteryResult.name}`;
+            // Check if already in cart
             if (cart[mysteryKey]) {
-                alert('This mystery ball is already in your cart!');
-                return;
+                cart[mysteryKey].quantity += 1;
+            } else {
+                cart[mysteryKey] = { 
+                    quantity: 1, 
+                    price: CONFIG.pricing.mystery 
+                };
             }
             
-            const { name, value } = lastMysteryResult;
-            cart[mysteryKey] = { quantity: 1, price: CONFIG.pricing.mystery, actualValue: value };
             updateCartDisplay();
-            alert(`Added Mystery ${name} to cart!`);
             
-            // Reset for next purchase
-            resetMysteryBall();
-        }
-        
-        function resetMysteryBall() {
-            mysteryRevealed = false;
-            lastMysteryResult = null;
-            document.getElementById('mysteryBall').classList.remove('disabled');
-            document.getElementById('mysteryResult').classList.remove('revealed');
+            // Visual feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = "Added! ✓";
+            btn.style.background = "#00aa00";
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = "#8a2be2";
+            }, 1500);
         }
         
         function renderBundles() {
@@ -1914,6 +1798,11 @@
         window.onclick = function(event) { 
             if (event.target === document.getElementById('checkoutModal')) closeCheckout(); 
         }
+        
+        window.onload = init;
+    </script>
+</body>
+</html>
         
         window.onload = init;
     </script>
