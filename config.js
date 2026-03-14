@@ -37,14 +37,6 @@ const CONFIG = {
         }
     },
     
-    // MYSTERY BALL RARITY TIERS
-    mysteryTiers: {
-        common: { chance: 0.5, multiplier: 1, color: "#a8a878" },
-        uncommon: { chance: 0.3, multiplier: 1.2, color: "#6890f0" },
-        rare: { chance: 0.15, multiplier: 1.5, color: "#f8d030" },
-        legendary: { chance: 0.05, multiplier: 2, color: "#ffd700" }
-    },
-    
     // POKEMON LISTS
     pokemon: {
         standard: [
