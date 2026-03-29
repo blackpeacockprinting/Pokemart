@@ -164,9 +164,21 @@ async function loadN3DDesigns() {
     }
 }
 
+// Helper function to remove Pokedex numbers from names
+function cleanDesignName(name) {
+    // Remove patterns like "0137 - ", "001 - ", etc.
+    // Matches: 3-4 digits, optional leading zeros, followed by " - "
+    return name.replace(/^\d+\s*-\s*/, '').trim();
+}
+
 function mergeN3DDesigns() {
     CONFIG.n3dDesigns.forEach(design => {
-        const name = design.name || design.title;
+        // Get name from title and remove Pokedex number
+        const rawName = design.title || design.name || '';
+        const name = cleanDesignName(rawName);
+        
+        if (!name) return; // Skip if no valid name
+        
         const category = mapN3DCategory(design.category);
         
         if (!CONFIG.pokemon[category].includes(name)) {
