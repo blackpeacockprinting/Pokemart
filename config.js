@@ -1,5 +1,6 @@
 // ============================================
 // POKÉ MART CONFIGURATION FILE
+// WITH N3D API INTEGRATION
 // ============================================
 
 const CONFIG = {
@@ -13,7 +14,7 @@ const CONFIG = {
         teamDiscount: 0.15
     },
     
-    // BUNDLE DEALS - Fixed prices for actual savings
+    // BUNDLE DEALS
     bundles: {
         "Starter Trio": {
             items: ["Bulbasaur", "Charmander", "Squirtle"],
@@ -131,5 +132,59 @@ const CONFIG = {
         "Charmander": "https://i.imgur.com/Q1UBK4m.png",
         "Female Pikachu": "https://i.imgur.com/jnf3hqX.png",
         "Shiny Mega Rayquaza": "https://i.imgur.com/wqK51ei.png"
-    }
+    },
+    
+    // N3D SYNCED DESIGNS (populated dynamically)
+    n3dDesigns: [],
+    lastSync: null
 };
+
+// ============================================
+// N3D DESIGN LOADER
+// ============================================
+
+async function loadN3DDesigns() {
+    try {
+        const response = await fetch('data/n3d-designs.json');
+        if (!response.ok) {
+            console.log('No N3D designs file found, using base config only');
+            return;
+        }
+        
+        const data = await response.json();
+        CONFIG.n3dDesigns = data.designs || [];
+        CONFIG.lastSync = data.lastUpdated;
+        
+        console.log(`✅ Loaded ${CONFIG.n3dDesigns.length} N3D designs`);
+        
+        mergeN3DDesigns();
+        
+    } catch (error) {
+        console.warn('⚠️ Failed to load N3D designs:', error);
+    }
+}
+
+function mergeN3DDesigns() {
+    CONFIG.n3dDesigns.forEach(design => {
+        const name = design.name;
+        const category = mapN3DCategory(design.category);
+        
+        if (!CONFIG.pokemon[category].includes(name)) {
+            CONFIG.pokemon[category].push(name);
+            console.log(`➕ Added ${name} to ${category}`);
+        }
+    });
+}
+
+function mapN3DCategory(n3dCategory) {
+    const categoryMap = {
+        'standard': 'standard',
+        'mega': 'mega',
+        'special': 'special',
+        'event': 'event',
+        'legendary': 'standard',
+        'starter': 'standard'
+    };
+    
+    return categoryMap[n3dCategory?.toLowerCase()] || 'standard';
+}
