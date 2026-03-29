@@ -1042,7 +1042,7 @@
             </div>
         </div>
         
-        <!-- Mystery Ball - Simple purchasable item -->
+        <!-- Mystery Ball -->
         <div class="mystery-section">
             <h2 class="section-title"><span class="section-icon">❓</span> Mystery Pokéball <small style="font-size: 0.6em; color: #8a2be2;">Only $6!</small></h2>
             <p>Receive a random 3D printed Pokéball! Could be any Pokémon from our collection. A fun surprise!</p>
@@ -1068,7 +1068,7 @@
             <div class="bundle-grid" id="bundleGrid"></div>
         </div>
         
-        <!-- Cart Summary with Remove Buttons -->
+        <!-- Cart Summary -->
         <div class="cart-summary">
             <div class="cart-title">
                 🛒 Your Order
@@ -1269,7 +1269,11 @@
         let wishlist = JSON.parse(localStorage.getItem('pokemart_wishlist') || '[]');
         let currentTypeFilter = 'all';
         
-        function init() {
+        // UPDATED: Async init with N3D loading
+        async function init() {
+            // Load N3D designs FIRST (before rendering)
+            await loadN3DDesigns();
+            
             createFloatingBalls();
             
             setTimeout(() => {
@@ -1459,11 +1463,10 @@
             return 'standard';
         }
         
-        // Simplified Mystery Ball - Just adds item to cart
+        // Mystery Ball
         function addMysteryItemToCart() {
             const mysteryKey = "Mystery Pokéball";
             
-            // Check if already in cart
             if (cart[mysteryKey]) {
                 cart[mysteryKey].quantity += 1;
             } else {
@@ -1475,7 +1478,6 @@
             
             updateCartDisplay();
             
-            // Visual feedback
             const btn = event.target;
             const originalText = btn.textContent;
             btn.textContent = "Added! ✓";
@@ -1634,12 +1636,10 @@
             document.querySelector(`[data-name="${name}"]`).classList.toggle('selected', qty > 0);
         }
         
-        // NEW: Remove item from cart
         function removeFromCart(name) {
             delete cart[name];
             updateCartDisplay();
             
-            // Reset quantity display if it was a regular pokemon
             const qtyDisplay = document.getElementById(`qty-${name.replace(/\s+/g, '-')}`);
             if (qtyDisplay) {
                 qtyDisplay.textContent = '0';
@@ -1650,12 +1650,10 @@
                 }
             }
             
-            // Remove selected class from card
             const card = document.querySelector(`[data-name="${name}"]`);
             if (card) card.classList.remove('selected');
         }
         
-        // NEW: Clear entire cart
         function clearCart() {
             if (Object.keys(cart).length === 0) return;
             if (!confirm('Are you sure you want to clear your entire cart?')) return;
@@ -1663,7 +1661,6 @@
             cart = {};
             updateCartDisplay();
             
-            // Reset all quantity displays
             document.querySelectorAll('.qty-display').forEach(el => el.textContent = '0');
             document.querySelectorAll('.add-to-cart').forEach(el => { 
                 el.textContent = 'Add to Cart'; 
@@ -1672,7 +1669,6 @@
             document.querySelectorAll('.product-card').forEach(el => el.classList.remove('selected'));
         }
         
-        // UPDATED: Cart display with remove buttons
         function updateCartDisplay() {
             const count = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
             const total = Object.values(cart).reduce((sum, item) => sum + (item.quantity * item.price), 0);
@@ -1798,11 +1794,6 @@
         window.onclick = function(event) { 
             if (event.target === document.getElementById('checkoutModal')) closeCheckout(); 
         }
-        
-        window.onload = init;
-    </script>
-</body>
-</html>
         
         window.onload = init;
     </script>
