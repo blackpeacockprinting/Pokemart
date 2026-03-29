@@ -31,8 +31,8 @@ jobs:
         async function fetchN3DDesigns() {
           return new Promise((resolve, reject) => {
             const options = {
-              hostname: 'n3d.design',
-              path: '/api/v1/designs',
+              hostname: 'www.n3dmelbourne.com',
+              path: '/api/v1/designs?limit=200&include=details',
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${API_KEY}`,
@@ -45,8 +45,12 @@ jobs:
               res.on('data', (chunk) => data += chunk);
               res.on('end', () => {
                 try {
-                  const designs = JSON.parse(data);
-                  resolve(designs);
+                  const response = JSON.parse(data);
+                  if (response.error) {
+                    reject(new Error(response.error));
+                  } else {
+                    resolve(response.data || response);
+                  }
                 } catch (e) {
                   reject(new Error('Failed to parse response: ' + e.message));
                 }
