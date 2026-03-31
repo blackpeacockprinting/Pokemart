@@ -31,19 +31,48 @@ jobs:
         import requests
         import json
         import os
+        import time
         
         API_KEY = os.environ['N3D_API_KEY']
         headers = {'Authorization': f'Bearer {API_KEY}'}
         
-        # Fetch all designs from N3D
-        response = requests.get('https://api.n3d.io/v1/designs', headers=headers)
-        designs = response.json()
+        all_designs = []
+        page = 1
+        limit = 200  # Max allowed by API
+        
+        # Fetch all pages of designs with full details
+        while True:
+            print(f"Fetching page {page}...")
+            response = requests.get(
+                f'https://www.n3dmelbourne.com/api/v1/designs?limit={limit}&page={page}&include=details',
+                headers=headers
+            )
+            
+            if response.status_code != 200:
+                print(f"Error: {response.status_code}")
+                print(response.text)
+                break
+            
+            data = response.json()
+            designs = data.get('data', [])
+            pagination = data.get('pagination', {})
+            
+            all_designs.extend(designs)
+            print(f"Got {len(designs)} designs (total: {len(all_designs)})")
+            
+            # Check if there are more pages
+            if not pagination.get('has_next', False):
+                break
+            
+            page += 1
+            time.sleep(0.5)  # Be nice to the API
         
         # Save to data directory
+        os.makedirs('data', exist_ok=True)
         with open('data/n3d-designs.json', 'w') as f:
-            json.dump(designs, f, indent=2)
+            json.dump(all_designs, f, indent=2)
         
-        print(f"Synced {len(designs)} designs")
+        print(f"Synced {len(all_designs)} total designs")
         EOF
     
     - name: Commit and push changes
