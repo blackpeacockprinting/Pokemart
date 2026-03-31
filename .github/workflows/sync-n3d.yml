@@ -32,6 +32,7 @@ jobs:
         import json
         import os
         import time
+        from datetime import datetime
         
         API_KEY = os.environ['N3D_API_KEY']
         headers = {'Authorization': f'Bearer {API_KEY}'}
@@ -39,46 +40,84 @@ jobs:
         all_designs = []
         page = 1
         limit = 200  # Max allowed by API
+        total_from_api = 0
         
         # Fetch all pages of designs with full details
         while True:
             print(f"Fetching page {page}...")
-            response = requests.get(
-                f'https://www.n3dmelbourne.com/api/v1/designs?limit={limit}&page={page}&include=details',
-                headers=headers
-            )
-            
-            if response.status_code != 200:
-                print(f"Error: {response.status_code}")
-                print(response.text)
+            try:
+                response = requests.get(
+                    f'https://www.n3dmelbourne.com/api/v1/designs?limit={limit}&page={page}&include=details',
+                    headers=headers,
+                    timeout=30
+                )
+                
+                if response.status_code != 200:
+                    print(f"ERROR: Status {response.status_code}")
+                    print(response.text)
+                    break
+                
+                data = response.json()
+                designs = data.get('data', [])
+                pagination = data.get('pagination', {})
+                
+                if page == 1:
+                    total_from_api = pagination.get('total', 0)
+                    print(f"API reports {total_from_api} total designs")
+                
+                all_designs.extend(designs)
+                print(f"Got {len(designs)} designs (running total: {len(all_designs)})")
+                
+                # Check if there are more pages
+                if not pagination.get('has_next', False):
+                    print("No more pages")
+                    break
+                
+                page += 1
+                if page > 10:  # Safety limit
+                    print("Hit safety limit")
+                    break
+                time.sleep(0.5)  # Be nice to the API
+                
+            except Exception as e:
+                print(f"ERROR: {e}")
                 break
-            
-            data = response.json()
-            designs = data.get('data', [])
-            pagination = data.get('pagination', {})
-            
-            all_designs.extend(designs)
-            print(f"Got {len(designs)} designs (total: {len(all_designs)})")
-            
-            # Check if there are more pages
-            if not pagination.get('has_next', False):
-                break
-            
-            page += 1
-            time.sleep(0.5)  # Be nice to the API
+        
+        print(f"\nTotal designs fetched: {len(all_designs)}")
         
         # Save to data directory
         os.makedirs('data', exist_ok=True)
-        with open('data/n3d-designs.json', 'w') as f:
-            json.dump(all_designs, f, indent=2)
         
-        print(f"Synced {len(all_designs)} total designs")
+        # Add metadata
+        output = {
+            'lastUpdated': datetime.utcnow().isoformat() + 'Z',
+            'totalDesigns': len(all_designs),
+            'designs': all_designs
+        }
+        
+        with open('data/n3d-designs.json', 'w') as f:
+            json.dump(output, f, indent=2)
+        
+        print(f"Saved to data/n3d-designs.json")
+        print(f"Timestamp: {output['lastUpdated']}")
         EOF
+    
+    - name: Check what changed
+      run: |
+        echo "=== File status ==="
+        ls -la data/
+        echo ""
+        echo "=== Git status ==="
+        git status
+        echo ""
+        echo "=== Git diff ==="
+        git diff --stat || true
     
     - name: Commit and push changes
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add data/n3d-designs.json
-        git diff --staged --quiet || git commit -m "Update N3D designs - $(date +'%Y-%m-%d %H:%M')"
-        git push
+        # Force commit even if only timestamp changed
+        git commit -m "Update N3D designs - $(date +'%Y-%m-%d %H:%M UTC')" || echo "Nothing to commit"
+        git push || echo "Nothing to push"
