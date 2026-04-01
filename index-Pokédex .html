@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Poké Mart - Custom 3D Printed Pokéballs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --pokedex-red: #DC0A2D;
+            --pokedex-dark-red: #B30824;
+            --screen-bg: #232323;
+            --screen-border: #1a1a1a;
+            --digital-green: #39FF14;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-gold: #FFD700;
+            --btn-team: #FFCC00;
+            --btn-search: #30A7D7;
+            --btn-cart: #4CAF50;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        /* Loading Screen */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--pokedex-red);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-pokeball {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            animation: shake 0.8s ease-in-out infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(-8deg); }
+            25% { transform: rotate(8deg); }
+            50% { transform: rotate(-8deg); }
+            75% { transform: rotate(8deg); }
+        }
+        
+        .loader-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 48%;
+            background: linear-gradient(180deg, #ff4444 0%, #cc0000 100%);
+            border-radius: 100px 100px 0 0;
+            border: 4px solid #000;
+            border-bottom: none;
+            transform-origin: bottom center;
+            transition: transform 0.5s ease;
+        }
+        
+        .loader-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 48%;
+            background: linear-gradient(180deg, #fff 0%, #ddd 100%);
+            border-radius: 0 0 100px 100px;
+            border: 4px solid #000;
+            border-top: none;
+        }
+        
+        .loader-button {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border: 4px solid #000;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
+        .loader-button::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border: 2px solid #000;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .loader.open .loader-top {
+            transform: rotateX(-120deg);
+        }
+        
+        .loader.open .loader-pokeball {
+            animation: none;
+        }
+        
+        .loader-text {
+            margin-top: 30px;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        /* Desktop: Full width layout */
+        @media (min-width: 769px) {
+            body {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+                overflow-y: auto;
+            }
+            
+            .pokedex-frame {
+                display: none;
+            }
+            
+            .desktop-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            
+            .desktop-header {
+                text-align: center;
+                padding: 30px 0;
+            }
+            
+            .desktop-logo {
+                width: 80px;
+                height: 80px;
+                margin: 0 auto 15px;
+            }
+            
+            .desktop-title {
+                font-family: 'Exo 2', sans-serif;
+                font-size: 3rem;
+                font-weight: 800;
+                color: var(--pokedex-red);
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            }
+            
+            .desktop-actions {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                display: flex;
+                gap: 15px;
+                z-index: 1000;
+            }
+            
+            .desktop-action-btn {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                border: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+                transition: transform 0.2s;
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 0.75rem;
+            }
+            
+            .desktop-action-btn:hover {
+                transform: scale(1.1);
+            }
+            
+            .desktop-action-btn.team { background: var(--btn-team); color: #000; }
+            .desktop-action-btn.search { background: var(--btn-search); color: #fff; }
+            .desktop-action-btn.cart { background: var(--btn-cart); color: #fff; }
+            
+            .desktop-action-btn .icon {
+                font-size: 1.5rem;
+                margin-bottom: 2px;
+            }
+            
+            .cart-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: #ff0000;
+                color: white;
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Exo 2', sans-serif;
+                font-size: 0.75rem;
+                font-weight: 700;
+            }
+        }
+        
+        /* Mobile: Pokédex Frame */
+        @media (max-width: 768px) {
+            .desktop-container { display: none; }
+            
+            .pokedex-frame {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: var(--pokedex-red);
+                display: flex;
+                flex-direction: column;
+                padding: 15px;
+                z-index: 1;
+            }
+            
+            /* Pokédex top section */
+            .pokedex-top {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding: 10px 15px;
+                background: linear-gradient(180deg, var(--pokedex-red) 0%, var(--pokedex-dark-red) 100%);
+                border-radius: 15px 15px 0 0;
+            }
+            
+            .pokedex-light {
+                width: 50px;
+                height: 50px;
+                background: radial-gradient(circle at 30% 30%, #4fc3f7, #0288d1);
+                border-radius: 50%;
+                border: 3px solid #333;
+                box-shadow: 0 0 20px rgba(79, 195, 247, 0.5), inset -5px -5px 10px rgba(0,0,0,0.3);
+                position: relative;
+            }
+            
+            .pokedex-light::after {
+                content: '';
+                position: absolute;
+                top: 10px;
+                left: 12px;
+                width: 15px;
+                height: 10px;
+                background: rgba(255,255,255,0.6);
+                border-radius: 50%;
+                transform: rotate(-45deg);
+            }
+            
+            .pokedex-small-lights {
+                display: flex;
+                gap: 8px;
+            }
+            
+            .pokedex-small-light {
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                border: 2px solid #333;
+            }
+            
+            .pokedex-small-light.red { background: #ff4444; box-shadow: 0 0 10px rgba(255,68,68,0.5); }
+            .pokedex-small-light.yellow { background: #ffeb3b; box-shadow: 0 0 10px rgba(255,235,59,0.5); }
+            .pokedex-small-light.green { background: #4caf50; box-shadow: 0 0 10px rgba(76,175,80,0.5); }
+            
+            /* Pokédex screen area */
+            .pokedex-screen-border {
+                flex: 1;
+                background: #ddd;
+                border-radius: 15px;
+                padding: 20px;
+                margin: 10px 0;
+                box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+            }
+            
+            .pokedex-screen {
+                height: 100%;
+                background: var(--screen-bg);
+                border-radius: 10px;
+                overflow-y: auto;
+                position: relative;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Screen content */
+            .screen-content {
+                padding: 15px;
+                min-height: 100%;
+            }
+            
+            .screen-header {
+                text-align: center;
+                padding: 15px 0;
+                border-bottom: 2px solid var(--pokedex-red);
+                margin-bottom: 15px;
+            }
+            
+            .screen-title {
+                font-family: 'Exo 2', sans-serif;
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: var(--pokedex-red);
+                text-shadow: 0 0 10px rgba(220, 10, 45, 0.5);
+            }
+            
+            .screen-subtitle {
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: var(--digital-green);
+                margin-top: 5px;
+                letter-spacing: 1px;
+            }
+            
+            /* Search */
+            .search-container {
+                margin-bottom: 15px;
+            }
+            
+            .search-input {
+                width: 100%;
+                padding: 12px 15px;
+                background: rgba(255,255,255,0.1);
+                border: 2px solid rgba(57, 255, 20, 0.3);
+                border-radius: 25px;
+                color: var(--text-primary);
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 1rem;
+            }
+            
+            .search-input:focus {
+                outline: none;
+                border-color: var(--digital-green);
+            }
+            
+            .search-input::placeholder {
+                color: var(--text-secondary);
+            }
+            
+            /* Type filters */
+            .type-filters {
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+            
+            .type-btn {
+                padding: 5px 10px;
+                border: none;
+                border-radius: 12px;
+                font-family: 'Rajdhani', sans-serif;
+                font-weight: 600;
+                font-size: 0.65rem;
+                text-transform: uppercase;
+                cursor: pointer;
+                opacity: 0.8;
+            }
+            
+            .type-btn.active { opacity: 1; box-shadow: 0 0 10px currentColor; }
+            
+            .type-fire { background: #f08030; color: white; }
+            .type-water { background: #6890f0; color: white; }
+            .type-electric { background: #f8d030; color: black; }
+            .type-grass { background: #78c850; color: white; }
+            .type-ice { background: #98d8d8; color: black; }
+            .type-fighting { background: #c03028; color: white; }
+            .type-poison { background: #a040a0; color: white; }
+            .type-ground { background: #e0c068; color: black; }
+            .type-flying { background: #a890f0; color: white; }
+            .type-psychic { background: #f85888; color: white; }
+            .type-bug { background: #a8b820; color: white; }
+            .type-rock { background: #b8a038; color: white; }
+            .type-ghost { background: #705898; color: white; }
+            .type-dragon { background: #7038f8; color: white; }
+            .type-dark { background: #705848; color: white; }
+            .type-steel { background: #b8b8d0; color: black; }
+            .type-fairy { background: #ee99ac; color: black; }
+            .type-normal { background: #a8a878; color: white; }
+            
+            /* Product grid */
+            .product-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            /* Product card */
+            .product-card {
+                background: rgba(255,255,255,0.05);
+                border-radius: 12px;
+                overflow: hidden;
+                position: relative;
+                border: 2px solid transparent;
+                transition: all 0.2s;
+            }
+            
+            .product-card:active {
+                transform: scale(0.98);
+            }
+            
+            .product-card.in-cart {
+                border-color: var(--digital-green);
+                box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+            }
+            
+            .card-image {
+                height: 120px;
+                background: linear-gradient(135deg, rgba(220, 10, 45, 0.2) 0%, rgba(0,0,0,0.3) 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                position: relative;
+            }
+            
+            .card-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .pokeball-placeholder {
+                width: 70px;
+                height: 70px;
+                position: relative;
+            }
+            
+            .pokeball-placeholder::before {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 48%;
+                background: transparent;
+                border: 3px solid rgba(255,255,255,0.5);
+                border-radius: 70px 70px 0 0;
+                border-bottom: none;
+                top: 0;
+            }
+            
+            .pokeball-placeholder::after {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 48%;
+                background: transparent;
+                border: 3px solid rgba(255,255,255,0.5);
+                border-radius: 0 0 70px 70px;
+                border-top: none;
+                bottom: 0;
+            }
+            
+            .pokeball-button {
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                background: var(--screen-bg);
+                border: 3px solid rgba(255,255,255,0.5);
+                border-radius: 50%;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 10;
+            }
+            
+            .card-type-badges {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                display: flex;
+                gap: 3px;
+            }
+            
+            .card-type-badge {
+                padding: 2px 6px;
+                border-radius: 8px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+            }
+            
+            .card-info {
+                padding: 10px;
+            }
+            
+            .card-name {
+                font-family: 'Exo 2', sans-serif;
+                font-size: 0.9rem;
+                font-weight: 700;
+                text-transform: capitalize;
+                margin-bottom: 2px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .card-price {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--text-gold);
+                margin-bottom: 8px;
+            }
+            
+            .card-actions {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            
+            .qty-btn {
+                width: 28px;
+                height: 28px;
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2);
+                border-radius: 6px;
+                color: var(--text-primary);
+                font-size: 1rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .qty-btn:active {
+                background: var(--pokedex-red);
+            }
+            
+            .qty-display {
+                flex: 1;
+                text-align: center;
+                font-weight: 700;
+                font-size: 1rem;
+            }
+            
+            .team-btn {
+                width: 28px;
+                height: 28px;
+                background: transparent;
+                border: 1px solid rgba(255,255,255,0.2);
+                border-radius: 6px;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .team-btn.in-team {
+                background: var(--btn-team);
+                color: #000;
+                border-color: var(--btn-team);
+            }
+            
+            /* Bottom action buttons */
+            .pokedex-bottom {
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+                padding: 15px;
+                background: linear-gradient(180deg, var(--pokedex-dark-red) 0%, var(--pokedex-red) 100%);
+                border-radius: 0 0 15px 15px;
+            }
+            
+            .action-btn {
+                width: 65px;
+                height: 65px;
+                border-radius: 50%;
+                border: 3px solid rgba(0,0,0,0.3);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                position: relative;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2);
+                transition: transform 0.1s;
+            }
+            
+            .action-btn:active {
+                transform: scale(0.95);
+            }
+            
+            .action-btn.team { background: var(--btn-team); }
+            .action-btn.search { background: var(--btn-search); }
+            .action-btn.cart { background: var(--btn-cart); }
+            
+            .action-btn .icon {
+                font-size: 1.5rem;
+                margin-bottom: 2px;
+            }
+            
+            .action-btn .label {
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: #000;
+            }
+            
+            .action-btn.cart .label {
+                color: #fff;
+            }
+            
+            .btn-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: #ff0000;
+                color: white;
+                min-width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Exo 2', sans-serif;
+                font-size: 0.8rem;
+                font-weight: 700;
+                border: 2px solid #333;
+            }
+            
+            /* Panels */
+            .panel {
+                display: none;
+                position: fixed;
+                bottom: 100px;
+                left: 15px;
+                right: 15px;
+                background: var(--screen-bg);
+                border: 3px solid var(--pokedex-red);
+                border-radius: 15px;
+                padding: 15px;
+                z-index: 100;
+                max-height: 60vh;
+                overflow-y: auto;
+                box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            }
+            
+            .panel.active {
+                display: block;
+            }
+            
+            .panel-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+            
+            .panel-title {
+                font-family: 'Exo 2', sans-serif;
+                font-size: 1.1rem;
+                font-weight: 700;
+            }
+            
+            .panel-close {
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+            
+            /* Team panel */
+            .team-slots {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .team-slot {
+                aspect-ratio: 1;
+                background: rgba(255,255,255,0.05);
+                border: 2px dashed rgba(255,255,255,0.2);
+                border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+            
+            .team-slot.filled {
+                border-style: solid;
+                border-color: var(--btn-team);
+                background: rgba(255, 204, 0, 0.1);
+            }
+            
+            .team-slot-number {
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: rgba(255,255,255,0.5);
+            }
+            
+            .team-slot-name {
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-align: center;
+                padding: 2px;
+            }
+            
+            .team-slot-remove {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                width: 20px;
+                height: 20px;
+                background: var(--pokedex-red);
+                border: none;
+                border-radius: 50%;
+                color: white;
+                font-size: 0.8rem;
+                cursor: pointer;
+            }
+            
+            .team-bonus {
+                text-align: center;
+                padding: 10px;
+                background: rgba(255, 204, 0, 0.2);
+                border: 1px solid var(--btn-team);
+                border-radius: 10px;
+            }
+            
+            .team-bonus-text {
+                font-family: 'Exo 2', sans-serif;
+                font-size: 0.9rem;
+                font-weight: 700;
+                color: var(--btn-team);
+            }
+            
+            /* Cart panel */
+            .cart-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+            
+            .cart-item-name {
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+            
+            .cart-item-qty {
+                color: var(--text-secondary);
+                font-size: 0.75rem;
+            }
+            
+            .cart-item-price {
+                color: var(--text-gold);
+                font-weight: 700;
+            }
+            
+            .cart-total {
+                display: flex;
+                justify-content: space-between;
+                padding: 15px 0;
+                border-top: 2px solid var(--pokedex-red);
+                margin-top: 10px;
+                font-size: 1.2rem;
+                font-weight: 700;
+            }
+            
+            .cart-total-amount {
+                color: var(--text-gold);
+            }
+            
+            .checkout-btn {
+                width: 100%;
+                padding: 15px;
+                background: var(--pokedex-red);
+                border: none;
+                border-radius: 10px;
+                color: white;
+                font-family: 'Exo 2', sans-serif;
+                font-weight: 700;
+                font-size: 1rem;
+                cursor: pointer;
+                margin-top: 10px;
+            }
+            
+            .cart-empty {
+                text-align: center;
+                padding: 30px;
+                color: var(--text-secondary);
+            }
+            
+            /* Image lightbox */
+            .lightbox {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.95);
+                z-index: 1000;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+            
+            .lightbox.active {
+                display: flex;
+            }
+            
+            .lightbox-content {
+                max-width: 90%;
+                max-height: 80%;
+                text-align: center;
+            }
+            
+            .lightbox img {
+                max-width: 100%;
+                max-height: 70vh;
+                border-radius: 10px;
+            }
+            
+            .lightbox-name {
+                font-family: 'Exo 2', sans-serif;
+                font-size: 1.5rem;
+                margin-top: 15px;
+            }
+            
+            .lightbox-close {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 2rem;
+                cursor: pointer;
+            }
+            
+            /* Modal overlay */
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 50;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+            
+            /* Checkout modal */
+            .checkout-modal {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--screen-bg);
+                border: 3px solid var(--digital-green);
+                border-radius: 15px;
+                padding: 20px;
+                width: 90%;
+                max-width: 400px;
+                z-index: 200;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+            
+            .checkout-modal.active {
+                display: block;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+            }
+            
+            .form-input, .form-select {
+                width: 100%;
+                padding: 12px;
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2);
+                border-radius: 8px;
+                color: var(--text-primary);
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 1rem;
+            }
+            
+            .form-input:focus {
+                outline: none;
+                border-color: var(--digital-green);
+            }
+            
+            .submit-order-btn {
+                width: 100%;
+                padding: 15px;
+                background: var(--pokedex-red);
+                border: none;
+                border-radius: 10px;
+                color: white;
+                font-family: 'Exo 2', sans-serif;
+                font-weight: 700;
+                font-size: 1rem;
+                cursor: pointer;
+                margin-top: 10px;
+            }
+            
+            .payment-notice {
+                text-align: center;
+                padding: 10px;
+                background: rgba(76, 175, 80, 0.2);
+                border: 1px solid var(--btn-cart);
+                border-radius: 8px;
+                margin: 15px 0;
+                font-size: 0.85rem;
+            }
+            
+            /* Success message */
+            .success-message {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+                padding: 30px 50px;
+                border-radius: 15px;
+                text-align: center;
+                z-index: 300;
+                border: 3px solid white;
+            }
+            
+            .success-message.active {
+                display: block;
+                animation: pop 0.3s ease;
+            }
+            
+            @keyframes pop {
+                0% { transform: translate(-50%, -50%) scale(0); }
+                80% { transform: translate(-50%, -50%) scale(1.1); }
+                100% { transform: translate(-50%, -50%) scale(1); }
+            }
+            
+            /* Mystery section */
+            .mystery-section {
+                background: linear-gradient(135deg, rgba(138, 43, 226, 0.2) 0%, rgba(255, 0, 255, 0.1) 100%);
+                border: 2px solid #8a2be2;
+                border-radius: 15px;
+                padding: 20px;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+            
+            .mystery-title {
+                font-family: 'Exo 2', sans-serif;
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin-bottom: 5px;
+            }
+            
+            .mystery-price {
+                font-family: 'Exo 2', sans-serif;
+                font-size: 0.9rem;
+                font-weight: 700;
+                color: #ff00ff;
+                margin-bottom: 10px;
+            }
+            
+            .mystery-ball {
+                width: 80px;
+                height: 80px;
+                margin: 15px auto;
+                background: linear-gradient(135deg, #8a2be2 0%, #ff00ff 100%);
+                border-radius: 50%;
+                border: 3px solid #000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2.5rem;
+                animation: float 2s ease-in-out infinite;
+            }
+            
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+            }
+            
+            .mystery-btn {
+                padding: 12px 25px;
+                background: linear-gradient(135deg, #8a2be2 0%, #ff00ff 100%);
+                border: none;
+                border-radius: 20px;
+                color: white;
+                font-family: 'Exo 2', sans-serif;
+                font-weight: 700;
+                cursor: pointer;
+            }
+            
+            /* Bundle section */
+            .bundle-section {
+                margin-bottom: 20px;
+            }
+            
+            .bundle-title {
+                font-family: 'Exo 2', sans-serif;
+                font-size: 1rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .bundle-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .bundle-card {
+                background: rgba(0, 191, 255, 0.1);
+                border: 1px solid #00bfff;
+                border-radius: 10px;
+                padding: 12px;
+                cursor: pointer;
+                position: relative;
+            }
+            
+            .bundle-savings {
+                position: absolute;
+                top: -8px;
+                right: 5px;
+                background: #00aa00;
+                padding: 4px 10px;
+                border-radius: 10px;
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 0.75rem;
+                font-weight: 700;
+            }
+            
+            .bundle-name {
+                font-weight: 700;
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+            }
+            
+            .bundle-items {
+                font-size: 0.7rem;
+                color: var(--text-secondary);
+                margin-bottom: 8px;
+            }
+            
+            .bundle-price {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--text-gold);
+            }
+            
+            .bundle-original {
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                text-decoration: line-through;
+                margin-left: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-pokeball">
+            <div class="loader-top"></div>
+            <div class="loader-bottom"></div>
+            <div class="loader-button"></div>
+        </div>
+        <div class="loader-text">Loading Poké Mart...</div>
+    </div>
+    
+    <!-- Desktop Layout -->
+    <div class="desktop-container">
+        <div class="desktop-header">
+            <div class="desktop-logo">
+                <svg viewBox="0 0 100 100" style="width:100%;height:100%;">
+                    <circle cx="50" cy="50" r="48" fill="#DC0A2D" stroke="#000" stroke-width="4"/>
+                    <path d="M2,50 L98,50" stroke="#000" stroke-width="8"/>
+                    <circle cx="50" cy="50" r="18" fill="#fff" stroke="#000" stroke-width="4"/>
+                    <circle cx="50" cy="50" r="8" fill="#fff" stroke="#000" stroke-width="2"/>
+                </svg>
+            </div>
+            <h1 class="desktop-title">Poké Mart</h1>
+            <p style="color: #39FF14; font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 600; margin-top: 10px; letter-spacing: 2px;">Custom 3D Printed Pokéballs</p>
+        </div>
+        
+        <div class="controls" style="background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+            <div class="search-container">
+                <input type="text" class="search-input" id="desktopSearch" placeholder="🔍 Search Pokemon..." onkeyup="filterPokemon()" style="width: 100%;">
+            </div>
+            <div class="type-filters" id="desktopTypeFilter"></div>
+        </div>
+        
+        <div id="desktopProducts"></div>
+        
+        <div class="desktop-actions">
+            <button class="desktop-action-btn team" onclick="toggleTeamPanel()">
+                <span class="icon">⭐</span>
+                <span id="desktopTeamCount">0/6</span>
+            </button>
+            <button class="desktop-action-btn search" onclick="focusSearch()">
+                <span class="icon">🔍</span>
+            </button>
+            <button class="desktop-action-btn cart" onclick="toggleCartPanel()">
+                <span class="icon">🛒</span>
+                <span class="cart-badge" id="desktopCartCount">0</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile: Pokédex Frame -->
+    <div class="pokedex-frame">
+        <!-- Top section with lights -->
+        <div class="pokedex-top">
+            <div class="pokedex-light"></div>
+            <div class="pokedex-small-lights">
+                <div class="pokedex-small-light red"></div>
+                <div class="pokedex-small-light yellow"></div>
+                <div class="pokedex-small-light green"></div>
+            </div>
+        </div>
+        
+        <!-- Screen area -->
+        <div class="pokedex-screen-border">
+            <div class="pokedex-screen" id="pokedexScreen">
+                <div class="screen-content">
+                    <!-- Header -->
+                    <div class="screen-header">
+                        <div class="screen-title">POKÉ MART</div>
+                        <div class="screen-subtitle">Custom 3D Printed Pokéballs</div>
+                    </div>
+                    
+                    <!-- Search -->
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search Pokemon..." onkeyup="filterPokemon()">
+                    </div>
+                    
+                    <!-- Type filters -->
+                    <div class="type-filters" id="typeFilter"></div>
+                    
+                    <!-- Products -->
+                    <div id="productContainer"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom action buttons -->
+        <div class="pokedex-bottom">
+            <button class="action-btn team" onclick="toggleTeamPanel()">
+                <span class="icon">⭐</span>
+                <span class="label" id="teamBtnLabel">0/6</span>
+            </button>
+            <button class="action-btn search" onclick="focusSearch()">
+                <span class="icon">🔍</span>
+                <span class="label">FIND</span>
+            </button>
+            <button class="action-btn cart" onclick="toggleCartPanel()">
+                <span class="icon">🛒</span>
+                <span class="label">BUY</span>
+                <span class="btn-badge" id="cartBadge" style="display: none;">0</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Panels (shared) -->
+    <div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
+    
+    <!-- Team Panel -->
+    <div class="panel" id="teamPanel">
+        <div class="panel-header">
+            <div class="panel-title">⭐ Team Builder</div>
+            <button class="panel-close" onclick="closeAllPanels()">×</button>
+        </div>
+        <div class="team-slots" id="teamSlots"></div>
+        <div class="team-bonus" id="teamBonus" style="display: none;">
+            <div class="team-bonus-text">🎉 6/6 = 15% OFF!</div>
+        </div>
+    </div>
+    
+    <!-- Cart Panel -->
+    <div class="panel" id="cartPanel">
+        <div class="panel-header">
+            <div class="panel-title">🛒 Your Cart</div>
+            <button class="panel-close" onclick="closeAllPanels()">×</button>
+        </div>
+        <div id="cartItems"></div>
+        <div class="cart-total">
+            <span>Total</span>
+            <span class="cart-total-amount">$<span id="cartTotal">0.00</span></span>
+        </div>
+        <div style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin: 10px 0;">
+            💵 Cash or Zelle on pickup
+        </div>
+        <button class="checkout-btn" onclick="openCheckout()">Place Order</button>
+    </div>
+    
+    <!-- Image Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="lightbox-close">×</button>
+        <div class="lightbox-content">
+            <img id="lightboxImg" src="" alt="">
+            <div class="lightbox-name" id="lightboxName"></div>
+        </div>
+    </div>
+    
+    <!-- Checkout Modal -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="panel-header">
+            <div class="panel-title">Complete Order</div>
+            <button class="panel-close" onclick="closeCheckout()">×</button>
+        </div>
+        <form id="orderForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSeWDeDLu3G_anztBC2TU4rNa-nuyhgNNph5sBlO8Et4glgnBA/formResponse" method="POST" target="_blank">
+            <div class="form-group">
+                <label class="form-label">Your Name *</label>
+                <input type="text" class="form-input" name="entry.1348287636" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" class="form-input" name="entry.433867564" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone *</label>
+                <input type="tel" class="form-input" name="entry.194469674" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Contact Method</label>
+                <select class="form-select" name="entry.2016762598">
+                    <option value="Text">Text</option>
+                    <option value="Call">Call</option>
+                    <option value="Email">Email</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Order</label>
+                <textarea class="form-input" name="entry.1022683128" id="orderDetails" readonly style="min-height: 60px; font-size: 0.85rem;"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Total</label>
+                <input type="text" class="form-input" name="entry.1494456050" id="orderTotal" readonly style="font-weight: 700; color: var(--text-gold);">
+            </div>
+            <div class="payment-notice">
+                💵 Payment due on pickup<br>
+                <small>Cash or Zelle accepted</small>
+            </div>
+            <button type="submit" class="submit-order-btn" onclick="return submitOrder()">Send Order</button>
+        </form>
+    </div>
+    
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <div style="font-family: 'Exo 2', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">🎉 Order Sent!</div>
+        <div>We'll contact you soon!</div>
+    </div>
+
+    <script>
+        // Pokemon types data
+        const pokemonTypes = {
+            "Bulbasaur": ["grass", "poison"], "Ivysaur": ["grass", "poison"], "Venusaur": ["grass", "poison"],
+            "Charmander": ["fire"], "Charmeleon": ["fire"], "Charizard": ["fire", "flying"],
+            "Squirtle": ["water"], "Wartortle": ["water"], "Blastoise": ["water"],
+            "Caterpie": ["bug"], "Metapod": ["bug"], "Butterfree": ["bug", "flying"],
+            "Weedle": ["bug", "poison"], "Kakuna": ["bug", "poison"], "Beedrill": ["bug", "poison"],
+            "Pidgey": ["normal", "flying"], "Pidgeotto": ["normal", "flying"], "Pidgeot": ["normal", "flying"],
+            "Rattata": ["normal"], "Raticate": ["normal"],
+            "Spearow": ["normal", "flying"], "Fearow": ["normal", "flying"],
+            "Ekans": ["poison"], "Arbok": ["poison"],
+            "Pikachu": ["electric"], "Female Pikachu": ["electric"], "Raichu": ["electric"],
+            "Sandshrew": ["ground"], "Sandslash": ["ground"],
+            "Nidoran♀": ["poison"], "Nidorina": ["poison"], "Nidoqueen": ["poison", "ground"],
+            "Nidoran♂": ["poison"], "Nidorino": ["poison"], "Nidoking": ["poison", "ground"],
+            "Clefairy": ["fairy"], "Clefable": ["fairy"],
+            "Vulpix": ["fire"], "Ninetales": ["fire"],
+            "Jigglypuff": ["normal", "fairy"], "Wigglytuff": ["normal", "fairy"],
+            "Zubat": ["poison", "flying"], "Golbat": ["poison", "flying"],
+            "Oddish": ["grass", "poison"], "Gloom": ["grass", "poison"], "Vileplume": ["grass", "poison"],
+            "Paras": ["bug", "grass"], "Parasect": ["bug", "grass"],
+            "Venonat": ["bug", "poison"], "Venomoth": ["bug", "poison"],
+            "Diglett": ["ground"], "Dugtrio": ["ground"],
+            "Meowth": ["normal"], "Persian": ["normal"],
+            "Psyduck": ["water"], "Golduck": ["water"],
+            "Mankey": ["fighting"], "Primeape": ["fighting"],
+            "Growlithe": ["fire"], "Arcanine": ["fire"],
+            "Poliwag": ["water"], "Poliwhirl": ["water"], "Poliwrath": ["water", "fighting"],
+            "Abra": ["psychic"], "Kadabra": ["psychic"], "Alakazam": ["psychic"],
+            "Machop": ["fighting"], "Machoke": ["fighting"], "Machamp": ["fighting"],
+            "Bellsprout": ["grass", "poison"], "Weepinbell": ["grass", "poison"], "Victreebel": ["grass", "poison"],
+            "Ponyta": ["fire"],
+            "Magnetite": ["electric"], "Magneton": ["electric"],
+            "Grimer": ["poison"], "Muk": ["poison"],
+            "Shellder": ["water"], "Cloyster": ["water", "ice"],
+            "Gastly": ["ghost", "poison"], "Haunter": ["ghost", "poison"], "Gengar": ["ghost", "poison"],
+            "Onix": ["rock", "ground"],
+            "Krabby": ["water"], "Kingler": ["water"],
+            "Voltorb": ["electric"], "Electrode": ["electric"],
+            "Exeggcute": ["grass", "psychic"], "Exeggutor": ["grass", "psychic"],
+            "Cubone": ["ground"], "Marowak": ["ground"],
+            "Koffing": ["poison"], "Weezing": ["poison"],
+            "Chansey": ["normal"], "Kangaskhan": ["normal"],
+            "Horsea": ["water"], "Seadra": ["water"],
+            "Staryu": ["water"], "Starmie": ["water", "psychic"],
+            "Scyther": ["bug", "flying"], "Electabuzz": ["electric"],
+            "Pinsir": ["bug"], "Tauros": ["normal"],
+            "Magikarp": ["water"], "Gyarados": ["water", "flying"], "Shiny Gyarados": ["water", "flying"],
+            "Lapras": ["water", "ice"], "Ditto": ["normal"],
+            "Eevee": ["normal"], "Vaporeon": ["water"], "Jolteon": ["electric"], "Flareon": ["fire"],
+            "Snorlax": ["normal"],
+            "Articuno": ["ice", "flying"], "Zapdos": ["electric", "flying"], "Moltres": ["fire", "flying"],
+            "Dratini": ["dragon"], "Dragonair": ["dragon"], "Dragonite": ["dragon", "flying"],
+            "Mewtwo": ["psychic"], "Mew": ["psychic"],
+            "Chikorita": ["grass"], "Cyndaquil": ["fire"], "Totodile": ["water"],
+            "Furret": ["normal"], "Pichu": ["electric"], "Togepi": ["fairy"], "Wooper": ["water", "ground"],
+            "Espeon": ["psychic"], "Umbreon": ["dark"],
+            "Raikou": ["electric"], "Entei": ["fire"], "Suicune": ["water"],
+            "Tyranitar": ["rock", "dark"],
+            "Lugia": ["psychic", "flying"], "Ho-Oh": ["fire", "flying"], "Celebi": ["psychic", "grass"],
+            "Blaziken": ["fire", "fighting"], "Gardevoir": ["psychic", "fairy"], "Absol": ["dark"],
+            "Salamence": ["dragon", "flying"], "Metagross": ["steel", "psychic"], "Shiny Metagross": ["steel", "psychic"],
+            "Latias": ["dragon", "psychic"], "Latios": ["dragon", "psychic"],
+            "Kyogre": ["water"], "Groudon": ["ground"],
+            "Rayquaza": ["dragon", "flying"], "Shiny Rayquaza": ["dragon", "flying"],
+            "Jirachi": ["steel", "psychic"],
+            "Piplup": ["water"], "Bidoof": ["normal"],
+            "Garchomp": ["dragon", "ground"], "Lucario": ["fighting", "steel"],
+            "Leafeon": ["grass"], "Glaceon": ["ice"],
+            "Dialga": ["steel", "dragon"], "Palkia": ["water", "dragon"], "Giratina": ["ghost", "dragon"],
+            "Darkrai": ["dark"], "Arceus": ["normal"],
+            "Trubbish": ["poison"], "Zorua": ["dark"], "Zoroark": ["dark"],
+            "Chandelure": ["ghost", "fire"], "Zekrom": ["dragon", "electric"],
+            "Greninja": ["water", "dark"], "Sylveon": ["fairy"],
+            "Mimikyu": ["ghost", "fairy"], "Dragapult": ["dragon", "ghost"], "Ceruledge": ["fire", "ghost"], "Tinkaton": ["fairy", "steel"],
+            "Deoxys": ["psychic"], "Sprigatito": ["grass"],
+            "Mega Charizard X": ["fire", "dragon"], "Mega Charizard Y": ["fire", "flying"],
+            "Mega Blastoise": ["water"],
+            "Mega Raichu X": ["electric"], "Mega Raichu Y": ["electric"],
+            "Mega Gengar": ["ghost", "poison"],
+            "Mega Rayquaza": ["dragon", "flying"], "Shiny Mega Rayquaza": ["dragon", "flying"],
+            "Mega Lucario": ["fighting", "steel"],
+            "Ash Greninja": ["water", "dark"],
+            "Galarian Ponyta": ["psychic"],
+            "Halloween Bulbasaur": ["grass", "poison"],
+            "Christmas Bulbasaur": ["grass", "poison"],
+            "Love Bulbasaur": ["grass", "poison"]
+        };
+        
+        let cart = {};
+        let team = [];
+        let currentTypeFilter = 'all';
+        let isMobile = window.innerWidth <= 768;
+        
+        // Initialize
+        async function init() {
+            await loadN3DDesigns();
+            createTypeFilters();
+            renderProducts();
+            initTeamSlots();
+            renderBundles();
+            loadCartFromURL();
+            
+            window.addEventListener('resize', () => {
+                isMobile = window.innerWidth <= 768;
+            });
+            
+            // Hide loader with opening animation
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                loader.classList.add('open');
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                }, 600);
+            }, 1500);
+        }
+        
+        function createTypeFilters() {
+            const types = ['fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy', 'normal'];
+            const mobileContainer = document.getElementById('typeFilter');
+            const desktopContainer = document.getElementById('desktopTypeFilter');
+            
+            types.forEach(type => {
+                const btn = document.createElement('button');
+                btn.className = `type-btn type-${type}`;
+                btn.textContent = type;
+                btn.onclick = () => filterByType(type);
+                mobileContainer.appendChild(btn.cloneNode(true));
+                desktopContainer.appendChild(btn);
+            });
+        }
+        
+        function renderProducts() {
+            const mobileContainer = document.getElementById('productContainer');
+            const desktopContainer = document.getElementById('desktopProducts');
+            
+            let mobileHtml = '';
+            let desktopHtml = '';
+            
+            // Categories
+            const categories = ['standard', 'mega', 'special', 'event'];
+            
+            categories.forEach(category => {
+                const pokemon = CONFIG.pokemon[category] || [];
+                const price = CONFIG.pricing[category];
+                
+                if (pokemon.length === 0) return;
+                
+                // Mobile: All products in one grid
+                pokemon.forEach(name => {
+                    mobileHtml += createProductCard(name, category, price);
+                });
+                
+                // Desktop: Grouped by category
+                desktopHtml += `<div style="margin-bottom: 30px;">`;
+                desktopHtml += `<h2 style="font-family: 'Exo 2', sans-serif; font-size: 1.3rem; margin-bottom: 15px; text-transform: uppercase; color: var(--pokedex-red);">${category} ($${price})</h2>`;
+                desktopHtml += `<div class="product-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">`;
+                pokemon.forEach(name => {
+                    desktopHtml += createProductCard(name, category, price);
+                });
+                desktopHtml += `</div></div>`;
+            });
+            
+            // Mystery section
+            mobileHtml += `
+                <div class="mystery-section">
+                    <div class="mystery-title">Mystery Pokéball</div>
+                    <div class="mystery-price">Only $${CONFIG.pricing.mystery}!</div>
+                    <div class="mystery-ball">?</div>
+                    <button class="mystery-btn" onclick="addMysteryToCart()">Add Mystery Ball</button>
+                </div>
+            `;
+            
+            // Bundles
+            mobileHtml += `<div class="bundle-section">`;
+            mobileHtml += `<div class="bundle-title">📦 Bundle Deals</div>`;
+            mobileHtml += `<div class="bundle-grid" id="bundleGrid"></div>`;
+            mobileHtml += `</div>`;
+            
+            mobileContainer.innerHTML = mobileHtml;
+            desktopContainer.innerHTML = desktopHtml;
+            
+            renderBundles();
+        }
+        
+        function createProductCard(name, category, price) {
+            const imageUrl = CONFIG.images[name];
+            const types = pokemonTypes[name] || ['normal'];
+            const primaryType = Array.isArray(types) ? types[0] : types;
+            const qty = cart[name]?.quantity || 0;
+            const inTeam = team.includes(name);
+            
+            let typeBadges = '';
+            if (Array.isArray(types)) {
+                typeBadges = `<div class="card-type-badges">`;
+                types.forEach(t => {
+                    typeBadges += `<span class="card-type-badge type-${t}">${t}</span>`;
+                });
+                typeBadges += `</div>`;
+            } else {
+                typeBadges = `<div class="card-type-badges"><span class="card-type-badge type-${types}">${types}</span></div>`;
+            }
+            
+            const imageHtml = imageUrl 
+                ? `<img src="${imageUrl}" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'pokeball-placeholder\\'><div class=\\'pokeball-button\\'></div></div>';" onclick="openLightbox('${imageUrl}', '${name}')">`
+                : `<div class="pokeball-placeholder"><div class="pokeball-button"></div></div>`;
+            
+            return `
+                <div class="product-card ${qty > 0 ? 'in-cart' : ''}" data-name="${name}" data-type="${primaryType}">
+                    <div class="card-image">
+                        ${typeBadges}
+                        ${imageHtml}
+                    </div>
+                    <div class="card-info">
+                        <div class="card-name">${name}</div>
+                        <div class="card-price">$${price}.00</div>
+                        <div class="card-actions">
+                            <button class="qty-btn" onclick="updateQty('${name}', -1, ${price})">−</button>
+                            <span class="qty-display" id="qty-${name.replace(/\s+/g, '-')}">${qty}</span>
+                            <button class="qty-btn" onclick="updateQty('${name}', 1, ${price})">+</button>
+                            <button class="team-btn ${inTeam ? 'in-team' : ''}" onclick="toggleTeam('${name}')" title="Add to Team">⭐</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderBundles() {
+            const container = document.getElementById('bundleGrid');
+            if (!container) return;
+            
+            container.innerHTML = Object.entries(CONFIG.bundles).map(([name, data]) => {
+                const regularPrice = data.items.reduce((sum, item) => {
+                    const cat = findCategory(item);
+                    return sum + (CONFIG.pricing[cat] || 8);
+                }, 0);
+                const savings = regularPrice - data.price;
+                
+                return `
+                    <div class="bundle-card" onclick="addBundle('${name}')">
+                        ${savings > 0 ? `<span class="bundle-savings">Save $${savings}</span>` : ''}
+                        <div class="bundle-name">${name}</div>
+                        <div class="bundle-items">${data.items.join(', ')}</div>
+                        <div class="bundle-price">
+                            $${data.price}
+                            ${regularPrice > data.price ? `<span class="bundle-original">$${regularPrice}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Quantity & Cart
+        function updateQty(name, change, price) {
+            const currentQty = cart[name]?.quantity || 0;
+            const newQty = Math.max(0, currentQty + change);
+            
+            if (newQty === 0) {
+                delete cart[name];
+            } else {
+                cart[name] = { quantity: newQty, price };
+            }
+            
+            // Update display
+            const qtyDisplay = document.getElementById(`qty-${name.replace(/\s+/g, '-')}`);
+            if (qtyDisplay) qtyDisplay.textContent = newQty;
+            
+            // Update card styling
+            const card = document.querySelector(`[data-name="${name}"]`);
+            if (card) card.classList.toggle('in-cart', newQty > 0);
+            
+            updateCartDisplay();
+        }
+        
+        function addMysteryToCart() {
+            const key = 'Mystery Pokéball';
+            if (cart[key]) {
+                cart[key].quantity += 1;
+            } else {
+                cart[key] = { quantity: 1, price: CONFIG.pricing.mystery };
+            }
+            updateCartDisplay();
+            
+            const btn = event.target;
+            btn.textContent = 'Added!';
+            setTimeout(() => btn.textContent = 'Add Mystery Ball', 1500);
+        }
+        
+        function addBundle(bundleName) {
+            const bundle = CONFIG.bundles[bundleName];
+            const pricePerItem = Math.round(bundle.price / bundle.items.length);
+            
+            bundle.items.forEach(item => {
+                cart[item] = { quantity: 1, price: pricePerItem, isBundle: true };
+            });
+            
+            updateCartDisplay();
+            alert(`Added ${bundleName} to cart!`);
+        }
+        
+        function updateCartDisplay() {
+            const count = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+            const total = Object.values(cart).reduce((sum, item) => sum + (item.quantity * item.price), 0);
+            
+            // Update badges
+            const cartBadge = document.getElementById('cartBadge');
+            const desktopCartCount = document.getElementById('desktopCartCount');
+            
+            if (cartBadge) {
+                cartBadge.textContent = count;
+                cartBadge.style.display = count > 0 ? 'flex' : 'none';
+            }
+            if (desktopCartCount) desktopCartCount.textContent = count;
+            
+            document.getElementById('cartTotal').textContent = total.toFixed(2);
+            
+            // Update cart panel
+            const cartItems = document.getElementById('cartItems');
+            if (count === 0) {
+                cartItems.innerHTML = '<div class="cart-empty">🛒<br>Your cart is empty</div>';
+            } else {
+                cartItems.innerHTML = Object.entries(cart).map(([name, item]) => `
+                    <div class="cart-item">
+                        <div>
+                            <div class="cart-item-name">${name}</div>
+                            <div class="cart-item-qty">Qty: ${item.quantity}</div>
+                        </div>
+                        <div class="cart-item-price">$${(item.quantity * item.price).toFixed(2)}</div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Team Builder
+        function initTeamSlots() {
+            const container = document.getElementById('teamSlots');
+            container.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'team-slot';
+                slot.dataset.index = i;
+                slot.innerHTML = `<span class="team-slot-number">${i + 1}</span>`;
+                container.appendChild(slot);
+            }
+        }
+        
+        function toggleTeam(name) {
+            const index = team.indexOf(name);
+            
+            if (index > -1) {
+                team.splice(index, 1);
+            } else {
+                if (team.length >= 6) {
+                    alert('Team is full! Remove a Pokemon first.');
+                    return;
+                }
+                team.push(name);
+            }
+            
+            updateTeamDisplay();
+            renderProducts(); // Re-render to update star buttons
+        }
+        
+        function updateTeamDisplay() {
+            const slots = document.querySelectorAll('.team-slot');
+            slots.forEach((slot, i) => {
+                if (team[i]) {
+                    slot.classList.add('filled');
+                    slot.innerHTML = `
+                        <span class="team-slot-number">${i + 1}</span>
+                        <button class="team-slot-remove" onclick="removeFromTeam(${i})">×</button>
+                        <div class="team-slot-name">${team[i]}</div>
+                    `;
+                } else {
+                    slot.classList.remove('filled');
+                    slot.innerHTML = `<span class="team-slot-number">${i + 1}</span>`;
+                }
+            });
+            
+            // Update team count
+            const teamBtnLabel = document.getElementById('teamBtnLabel');
+            const desktopTeamCount = document.getElementById('desktopTeamCount');
+            
+            if (teamBtnLabel) teamBtnLabel.textContent = `${team.length}/6`;
+            if (desktopTeamCount) desktopTeamCount.textContent = `${team.length}/6`;
+            
+            // Show/hide bonus
+            const teamBonus = document.getElementById('teamBonus');
+            if (teamBonus) {
+                teamBonus.style.display = team.length === 6 ? 'block' : 'none';
+            }
+            
+            // Apply team discount
+            if (team.length === 6) {
+                team.forEach(name => {
+                    const cat = findCategory(name);
+                    const basePrice = CONFIG.pricing[cat] || 8;
+                    const discountPrice = Math.round(basePrice * (1 - CONFIG.pricing.teamDiscount));
+                    if (!cart[name] || !cart[name].isTeam) {
+                        cart[name] = { quantity: 1, price: discountPrice, isTeam: true };
+                    }
+                });
+                updateCartDisplay();
+            }
+        }
+        
+        function removeFromTeam(index) {
+            team.splice(index, 1);
+            updateTeamDisplay();
+            renderProducts();
+        }
+        
+        // Lightbox
+        function openLightbox(url, name) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImg');
+            const nameEl = document.getElementById('lightboxName');
+            
+            img.src = url;
+            nameEl.textContent = name;
+            lightbox.classList.add('active');
+        }
+        
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+        
+        // Panels
+        function toggleTeamPanel() {
+            const panel = document.getElementById('teamPanel');
+            const overlay = document.getElementById('overlay');
+            const isOpen = panel.classList.contains('active');
+            
+            closeAllPanels();
+            
+            if (!isOpen) {
+                panel.classList.add('active');
+                overlay.classList.add('active');
+            }
+        }
+        
+        function toggleCartPanel() {
+            const panel = document.getElementById('cartPanel');
+            const overlay = document.getElementById('overlay');
+            const isOpen = panel.classList.contains('active');
+            
+            closeAllPanels();
+            
+            if (!isOpen) {
+                panel.classList.add('active');
+                overlay.classList.add('active');
+            }
+        }
+        
+        function focusSearch() {
+            const searchInput = isMobile ? document.getElementById('searchInput') : document.getElementById('desktopSearch');
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        function closeAllPanels() {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('overlay').classList.remove('active');
+        }
+        
+        // Filters
+        function filterByType(type) {
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === type) btn.classList.add('active');
+            });
+            
+            currentTypeFilter = currentTypeFilter === type ? 'all' : type;
+            if (currentTypeFilter === 'all') {
+                document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+            }
+            
+            applyFilters();
+        }
+        
+        function filterPokemon() {
+            applyFilters();
+        }
+        
+        function applyFilters() {
+            const searchInput = isMobile ? document.getElementById('searchInput') : document.getElementById('desktopSearch');
+            const search = searchInput?.value.toLowerCase() || '';
+            
+            document.querySelectorAll('.product-card').forEach(card => {
+                const name = card.dataset.name.toLowerCase();
+                const type = card.dataset.type;
+                
+                const matchesSearch = name.includes(search);
+                const matchesType = currentTypeFilter === 'all' || type === currentTypeFilter;
+                
+                card.style.display = (matchesSearch && matchesType) ? 'block' : 'none';
+            });
+        }
+        
+        // Checkout
+        function openCheckout() {
+            if (Object.keys(cart).length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            
+            const total = Object.values(cart).reduce((sum, item) => sum + (item.quantity * item.price), 0);
+            const details = Object.entries(cart).map(([name, item]) => 
+                `${name} x${item.quantity} ($${item.price} each)`
+            ).join('\n');
+            
+            document.getElementById('orderDetails').value = details;
+            document.getElementById('orderTotal').value = `$${total.toFixed(2)}`;
+            
+            document.getElementById('checkoutModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+        
+        function closeCheckout() {
+            document.getElementById('checkoutModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+        
+        function submitOrder() {
+            document.getElementById('successMessage').classList.add('active');
+            
+            setTimeout(() => {
+                cart = {};
+                team = [];
+                updateCartDisplay();
+                updateTeamDisplay();
+                renderProducts();
+                closeCheckout();
+                closeAllPanels();
+            }, 1000);
+            
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.remove('active');
+            }, 3000);
+            
+            return true;
+        }
+        
+        // Helpers
+        function findCategory(name) {
+            for (let cat in CONFIG.pokemon) {
+                if (CONFIG.pokemon[cat].includes(name)) return cat;
+            }
+            return 'standard';
+        }
+        
+        function loadCartFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const cartData = params.get('cart');
+            if (cartData) {
+                try {
+                    cart = JSON.parse(atob(cartData));
+                    updateCartDisplay();
+                } catch(e) {}
+            }
+        }
+        
+        // Share functions
+        function shareCart() {
+            const cartData = btoa(JSON.stringify(cart));
+            const url = `${window.location.origin}${window.location.pathname}?cart=${cartData}`;
+            navigator.clipboard.writeText(url).then(() => alert('Cart link copied!'));
+        }
+        
+        function copyOrder() {
+            const items = Object.entries(cart).map(([name, item]) => 
+                `${name} x${item.quantity} - $${(item.quantity * item.price).toFixed(2)}`
+            ).join('\n');
+            const total = Object.values(cart).reduce((sum, item) => sum + (item.quantity * item.price), 0);
+            navigator.clipboard.writeText(`My Poké Mart Order:\n${items}\n\nTotal: $${total.toFixed(2)}`)
+                .then(() => alert('Order copied!'));
+        }
+        
+        // Wishlist
+        function saveWishlist() {
+            // Implementation if needed
+            alert('Wishlist feature coming soon!');
+        }
+        
+        window.onload = init;
+    </script>
+</body>
+</html>
