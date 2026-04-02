@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokePrint Order Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --bg-dark: #0f0f1a;
+            --bg-card: rgba(255,255,255,0.03);
+            --bg-hover: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.08);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.6);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 20px rgba(99,102,241,0.3);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 20px;
+            padding-bottom: 120px;
+            line-height: 1.5;
+        }
+        
+        /* Animated background gradient */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(99,102,241,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(236,72,153,0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: bgPulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes bgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .cloud-status {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .cloud-status.synced {
+            color: var(--success);
+            border-color: rgba(16,185,129,0.3);
+            background: rgba(16,185,129,0.1);
+        }
+        
+        .cloud-status.offline {
+            color: var(--danger);
+            border-color: rgba(239,68,68,0.3);
+            background: rgba(239,68,68,0.1);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 14px 8px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            transition: height 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(255,255,255,0.15);
+        }
+        
+        .stat-card:hover::before {
+            height: 100%;
+            opacity: 0.1;
+        }
+        
+        .stat-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+        
+        .stat-card.pending::before { background: var(--danger); }
+        .stat-card.printing::before { background: var(--warning); }
+        .stat-card.completed::before { background: var(--info); }
+        .stat-card.filament::before { background: var(--purple); }
+        .stat-card.low-stock::before { background: var(--danger); }
+        .stat-card.shopping::before { background: var(--info); }
+        .stat-card.revenue::before { background: var(--success); }
+        .stat-card.n3d::before { background: var(--pink); }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover .stat-number {
+            transform: scale(1.1);
+        }
+        
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+        
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px; height: 300px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            box-shadow: 0 4px 14px rgba(99,102,241,0.4);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(99,102,241,0.5), var(--shadow-glow);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            border: none;
+            box-shadow: 0 4px 14px rgba(16,185,129,0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            border: none;
+            box-shadow: 0 4px 14px rgba(245,158,11,0.4);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
+            border: none;
+            box-shadow: 0 4px 14px rgba(59,130,246,0.4);
+        }
+        
+        /* Customer Section */
+        .customer-section {
+            max-width: 700px;
+            margin: 0 auto 16px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease-out both;
+        }
+        
+        .customer-section:hover {
+            border-color: rgba(255,255,255,0.12);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .customer-header {
+            padding: 18px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            user-select: none;
+            background: linear-gradient(90deg, rgba(99,102,241,0.1) 0%, transparent 100%);
+        }
+        
+        .customer-header:hover {
+            background: linear-gradient(90deg, rgba(99,102,241,0.15) 0%, transparent 100%);
+        }
+        
+        .customer-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .customer-stats {
+            display: flex;
+            gap: 14px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .customer-orders {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .customer-orders.expanded {
+            max-height: 5000px;
+            padding: 16px;
+        }
+        
+        /* Order Card */
+        .order-card {
+            background: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .order-card:hover {
+            background: rgba(255,255,255,0.06);
+            transform: translateX(4px);
+        }
+        
+        .order-card.pending { border-left-color: var(--danger); }
+        .order-card.printing { border-left-color: var(--warning); }
+        .order-card.completed { border-left-color: var(--info); }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            padding-right: 40px;
+        }
+        
+        .order-id {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+        
+        .order-meta {
+            font-size: 0.8rem;
+            color: var(--success);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
+        .order-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+        
+        .status-pending { background: rgba(239,68,68,0.2); color: #fca5a5; }
+        .status-printing { background: rgba(245,158,11,0.2); color: #fcd34d; }
+        .status-completed { background: rgba(59,130,246,0.2); color: #93c5fd; }
+        
+        .delete-order-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(239,68,68,0.2);
+            border: none;
+            color: var(--danger);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-order-btn:hover {
+            background: var(--danger);
+            color: white;
+            transform: scale(1.1) rotate(90deg);
+        }
+        
+        /* Item Row */
+        .item-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        
+        .item-row:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(99,102,241,0.3);
+            transform: translateX(4px);
+        }
+        
+        .item-row.expanded {
+            background: rgba(99,102,241,0.08);
+            border-color: rgba(99,102,241,0.4);
+        }
+        
+        /* Pokeball */
+        .pokeball {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #1a1a2e;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        
+        .pokeball:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+        
+        .pokeball::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 50%;
+            background: linear-gradient(180deg, #ff4444 0%, #cc0000 100%);
+        }
+        
+        .pokeball::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 50%;
+            background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+        }
+        
+        .pokeball-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px; height: 14px;
+            background: #fff;
+            border: 3px solid #1a1a2e;
+            border-radius: 50%;
+            z-index: 1;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .pokeball.shiny {
+            border-color: #ffd700;
+            animation: shinyGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes shinyGlow {
+            0%, 100% { 
+                box-shadow: 0 0 20px #ffd700, 0 0 40px rgba(255,215,0,0.3), inset 0 0 20px rgba(255,215,0,0.2);
+            }
+            50% { 
+                box-shadow: 0 0 30px #ffed4e, 0 0 60px rgba(255,237,78,0.5), inset 0 0 30px rgba(255,237,78,0.3);
+            }
+        }
+        
+        .pokeball.shiny::before {
+            background: linear-gradient(180deg, #ffd700 0%, #ffaa00 100%);
+        }
+        
+        .item-details { flex: 1; min-width: 0; }
+        
+        .item-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .item-price {
+            font-size: 0.85rem;
+            color: var(--success);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        
+        .badges { display: flex; gap: 6px; flex-shrink: 0; }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            animation: badgePop 0.3s ease-out;
+        }
+        
+        @keyframes badgePop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .badge-shiny {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            box-shadow: 0 2px 8px rgba(255,215,0,0.4);
+        }
+        
+        /* Item Expanded */
+        .item-expanded {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                        padding 0.4s ease,
+                        opacity 0.3s ease;
+        }
+        
+        .item-expanded.visible {
+            max-height: 2000px;
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 14px;
+            margin-top: 10px;
+            opacity: 1;
+        }
+        
+        /* Filament Tags */
+        .filament-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .filament-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.08);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .filament-tag:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(99,102,241,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .filament-dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        /* Stats Grid in Item */
+        .item-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            padding: 14px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .stat-box:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(99,102,241,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .stat-box-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        
+        .stat-box-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--info);
+        }
+        
+        .stat-box-value.profit { color: var(--success); }
+        .stat-box-value.cost { color: var(--danger); }
+        
+        /* Item Actions */
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .item-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 8px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .item-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        
+        .item-btn:active::after {
+            width: 200px; height: 200px;
+        }
+        
+        .item-btn.pending { background: rgba(239,68,68,0.2); color: #fca5a5; }
+        .item-btn.pending:hover, .item-btn.pending.active { background: var(--danger); color: white; }
+        
+        .item-btn.printing { background: rgba(245,158,11,0.2); color: #fcd34d; }
+        .item-btn.printing:hover, .item-btn.printing.active { background: var(--warning); color: #333; }
+        
+        .item-btn.completed { background: rgba(59,130,246,0.2); color: #93c5fd; }
+        .item-btn.completed:hover, .item-btn.completed.active { background: var(--info); color: white; }
+        
+        .item-btn.shiny {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,237,78,0.2));
+            color: #ffd700;
+        }
+        
+        .item-btn.shiny:hover, .item-btn.shiny.active {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            box-shadow: 0 0 20px rgba(255,215,0,0.4);
+        }
+        
+        .item-btn.split {
+            background: rgba(236,72,153,0.2);
+            color: #f9a8d4;
+            border: 2px dashed rgba(236,72,153,0.3);
+        }
+        
+        .item-btn.split:hover {
+            background: var(--pink);
+            color: white;
+            border-style: solid;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            border-radius: 24px 24px 0 0;
+            padding: 28px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .close-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background: rgba(239,68,68,0.2);
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+        
+        /* Filament Grid */
+        .filament-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        
+        .filament-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .filament-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-4px);
+        }
+        
+        .filament-card.low-stock {
+            border-color: var(--danger);
+            background: rgba(239,68,68,0.1);
+            animation: lowStockPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes lowStockPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(239,68,68,0); }
+            50% { box-shadow: 0 0 20px rgba(239,68,68,0.3); }
+        }
+        
+        .filament-color {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            border: 3px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+        }
+        
+        .filament-card:hover .filament-color {
+            transform: scale(1.1);
+        }
+        
+        .filament-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+        
+        .filament-amount {
+            font-size: 1.3rem;
+            color: var(--info);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .filament-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .btn-tiny {
+            padding: 8px 14px;
+            font-size: 0.75rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-tiny:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Shopping List */
+        .shopping-list { list-style: none; }
+        
+        .shopping-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: rgba(239,68,68,0.08);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--danger);
+            transition: all 0.3s ease;
+        }
+        
+        .shopping-item:hover {
+            background: rgba(239,68,68,0.12);
+            transform: translateX(4px);
+        }
+        
+        /* Sync Status */
+        .sync-status {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .sync-status.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .sync-status.success {
+            background: rgba(16,185,129,0.95);
+            color: white;
+        }
+        
+        .sync-status.error {
+            background: rgba(239,68,68,0.95);
+            color: white;
+        }
+        
+        .sync-status.info {
+            background: rgba(99,102,241,0.95);
+            color: white;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Warning Banner */
+        .warning-banner {
+            background: rgba(245,158,11,0.15);
+            border: 1px solid rgba(245,158,11,0.4);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            color: #fcd34d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        /* Revenue Modal */
+        .revenue-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .revenue-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-4px);
+        }
+        
+        .revenue-card.success { border-color: rgba(16,185,129,0.3); }
+        .revenue-card.info { border-color: rgba(59,130,246,0.3); }
+        .revenue-card.warning { border-color: rgba(245,158,11,0.3); }
+        .revenue-card.pink { border-color: rgba(236,72,153,0.3); }
+        
+        /* Add Item Modal Inputs */
+        .modal input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .modal input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+        }
+        
+        .modal input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>⚡ PokePrint Order Tracker</h1>
+        <p>Manage orders, track filament, catch 'em all!</p>
+        <p id="cloudStatus" class="cloud-status">🔗 Initializing...</p>
+    </div>
+    
+    <!-- Sync Status Toast -->
+    <div id="syncStatus" class="sync-status"></div>
+    
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card pending" onclick="filterOrders('Pending')">
+            <div class="stat-number" id="pendingCount">0</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card printing" onclick="filterOrders('Printing')">
+            <div class="stat-number" id="printingCount">0</div>
+            <div class="stat-label">Printing</div>
+        </div>
+        <div class="stat-card completed" onclick="filterOrders('Completed')">
+            <div class="stat-number" id="completedCount">0</div>
+            <div class="stat-label">Completed</div>
+        </div>
+        <div class="stat-card revenue" onclick="openRevenueModal()">
+            <div class="stat-number" id="revenueCount">$0</div>
+            <div class="stat-label">Revenue</div>
+        </div>
+        <div class="stat-card filament" onclick="openFilamentModal()">
+            <div class="stat-number" id="filamentCount">0</div>
+            <div class="stat-label">Colors</div>
+        </div>
+        <div class="stat-card n3d" onclick="syncN3DDesigns()">
+            <div class="stat-number" id="n3dCount">0</div>
+            <div class="stat-label">N3D Designs</div>
+        </div>
+        <div class="stat-card low-stock" onclick="openShoppingModal()">
+            <div class="stat-number" id="lowStockCount">0</div>
+            <div class="stat-label">Low Stock</div>
+        </div>
+        <div class="stat-card shopping" onclick="openShoppingModal()">
+            <div class="stat-number" id="shoppingCount">0</div>
+            <div class="stat-label">Shop List</div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="actions">
+        <button class="btn btn-primary" onclick="syncOrders()">
+            <span>🔄</span> Sync Orders
+        </button>
+        <button class="btn btn-success" onclick="syncN3DDesigns()">
+            <span>🎨</span> Sync N3D
+        </button>
+        <button class="btn btn-warning" onclick="openFilamentModal()">
+            <span>🧵</span> Filament
+        </button>
+        <button class="btn btn-info" onclick="openShoppingModal()">
+            <span>🛒</span> Shop List
+        </button>
+    </div>
+    
+    <!-- Orders Container -->
+    <div id="ordersContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading orders...</p>
+        </div>
+    </div>
+
+    <!-- Filament Modal -->
+    <div id="filamentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🧵 Filament Inventory</div>
+                <button class="close-btn" onclick="closeModal('filamentModal')">&times;</button>
+            </div>
+            <div id="filamentContainer" class="filament-grid"></div>
+        </div>
+    </div>
+
+    <!-- Shopping List Modal -->
+    <div id="shoppingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🛒 Shopping List</div>
+                <button class="close-btn" onclick="closeModal('shoppingModal')">&times;</button>
+            </div>
+            <ul id="shoppingList" class="shopping-list"></ul>
+        </div>
+    </div>
+
+    <!-- Revenue Modal -->
+    <div id="revenueModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">💰 Revenue Breakdown</div>
+                <button class="close-btn" onclick="closeModal('revenueModal')">&times;</button>
+            </div>
+            <div id="revenueContainer"></div>
+        </div>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">➕ Add Item to Order</div>
+                <button class="close-btn" onclick="closeModal('addItemModal')">&times;</button>
+            </div>
+            <div style="padding: 10px 0;">
+                <input type="text" id="addItemName" placeholder="Item name (e.g., Pikachu)">
+                <input type="number" id="addItemPrice" placeholder="Price (e.g., 8)">
+                <input type="number" id="addItemQty" placeholder="Quantity" value="1">
+                <button class="btn btn-success" onclick="confirmAddItem()" style="width: 100%;">Add Item</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Configuration
+        const GOOGLE_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSk8BdvDMwzoPI2A5X863_8OAXKaSWs5a-aijyX7qMJRWFDoquKJs3gM20wcS-ggas_UuGjU8mCmz1V/pub?gid=1413466324&single=true&output=csv';
+        const N3D_DESIGNS_URL = 'https://raw.githubusercontent.com/blackpeacockprinting/BlackPeacockOrders/main/data/n3d-designs.json';
+        const FILAMENT_COST_PER_GRAM = 0.012;
+        const LOW_STOCK_THRESHOLD = 200;
+        const DEFAULT_FILAMENT_AMOUNT = 1000;
+        
+        // State
+        let orders = [];
+        let filaments = {};
+        let n3dDesigns = [];
+        let itemState = { splitSignatures: {}, shinySignatures: {}, deletedOrders: [] };
+        let currentFilter = 'all';
+        let db = null;
+        let currentAddOrderId = null;
+        
+        // Initialize Firebase
+        function initFirebase() {
+            try {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBTp9aLB3VaKIKpztrR029mG3mVEw5MNOQ",
+                    authDomain: "blackpeacockprinting-fbb65.firebaseapp.com",
+                    projectId: "blackpeacockprinting-fbb65",
+                    storageBucket: "blackpeacockprinting-fbb65.firebasestorage.app",
+                    messagingSenderId: "1025287520257",
+                    appId: "1:1025287520257:web:ff8d4ab1b69fd859c20000"
+                };
+                
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                
+                updateCloudStatus('connected');
+                initFirebaseListeners();
+            } catch (err) {
+                console.error('Firebase init error:', err);
+                updateCloudStatus('offline');
+            }
+        }
+        
+        function updateCloudStatus(status) {
+            const el = document.getElementById('cloudStatus');
+            if (status === 'connected') {
+                el.innerHTML = '☁️ <span>Synced across devices</span>';
+                el.className = 'cloud-status synced';
+            } else {
+                el.innerHTML = '💾 <span>Local mode</span>';
+                el.className = 'cloud-status offline';
+            }
+        }
+        
+        function initFirebaseListeners() {
+            if (!db) return;
+            
+            // Listen for orders
+            db.collection('pokeprint').doc('orders').onSnapshot((doc) => {
+                if (doc.exists && doc.data().orders) {
+                    orders = doc.data().orders;
+                    applyItemState();
+                    renderOrders();
+                    updateStats();
+                }
+            });
+            
+            db.collection('pokeprint').doc('itemState').onSnapshot((doc) => {
+                if (doc.exists) {
+                    itemState = doc.data();
+                    renderOrders();
+                }
+            });
+            
+            db.collection('pokeprint').doc('filamentInventory').onSnapshot((doc) => {
+                if (doc.exists) {
+                    filaments = doc.data().filaments || {};
+                    updateStats();
+                }
+            });
+            
+            db.collection('pokeprint').doc('n3dDesigns').onSnapshot((doc) => {
+                if (doc.exists) {
+                    n3dDesigns = doc.data().designs || [];
+                }
+            });
+        }
+        
+        async function saveItemState() {
+            if (!db) return;
+            try {
+                await db.collection('pokeprint').doc('itemState').set(itemState);
+            } catch (err) {
+                console.log('Save state error:', err);
+            }
+        }
+        
+        async function saveFilaments() {
+            if (!db) return;
+            try {
+                await db.collection('pokeprint').doc('filamentInventory').set({
+                    filaments: filaments,
+                    lastUpdated: new Date().toISOString()
+                });
+            } catch (err) {
+                console.log('Save filaments error:', err);
+            }
+        }
+        
+        async function saveN3DDesigns() {
+            if (!db) return;
+            try {
+                await db.collection('pokeprint').doc('n3dDesigns').set({
+                    designs: n3dDesigns,
+                    lastUpdated: new Date().toISOString()
+                });
+            } catch (err) {
+                console.log('Save N3D error:', err);
+            }
+        }
+        
+        // N3D Sync
+        async function syncN3DDesigns() {
+            showSyncStatus('Fetching N3D designs...', 'info');
+            try {
+                const response = await fetch(N3D_DESIGNS_URL + '?t=' + Date.now());
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                n3dDesigns = Array.isArray(data) ? data : (data.designs || []);
+                
+                const uniqueColors = new Set();
+                n3dDesigns.forEach(d => {
+                    if (d.colors && Array.isArray(d.colors)) {
+                        d.colors.forEach(c => { if (c.color) uniqueColors.add(c.color); });
+                    }
+                });
+                
+                let newColors = 0;
+                uniqueColors.forEach(color => {
+                    if (!filaments[color]) {
+                        filaments[color] = { amount: DEFAULT_FILAMENT_AMOUNT, color: generateColorHex(color) };
+                        newColors++;
+                    }
+                });
+                
+                await saveN3DDesigns();
+                await saveFilaments();
+                
+                showSyncStatus(`✅ Loaded ${n3dDesigns.length} designs with ${uniqueColors.size} colors`, 'success');
+                updateStats();
+                renderOrders();
+            } catch (error) {
+                showSyncStatus('❌ N3D sync failed: ' + error.message, 'error');
+            }
+        }
+        
+        // Order Sync - Merges new orders from Sheets with existing Firebase orders
+        async function syncOrders() {
+            showSyncStatus('Syncing orders from Google Sheets...', 'info');
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const csvText = await response.text();
+                const parsedOrders = parseCSV(csvText);
+                
+                // Filter out deleted orders
+                const newOrders = parsedOrders.filter(o => !(itemState.deletedOrders || []).includes(o.id));
+                
+                // Merge strategy: Keep existing orders (with manual changes), add new ones from Sheets
+                const existingOrderIds = new Set(orders.map(o => o.id));
+                const ordersToAdd = newOrders.filter(o => !existingOrderIds.has(o.id));
+                
+                // Add new orders from Sheets
+                if (ordersToAdd.length > 0) {
+                    orders = [...orders, ...ordersToAdd];
+                    showSyncStatus(`✅ Added ${ordersToAdd.length} new orders`, 'success');
+                } else {
+                    showSyncStatus(`✅ No new orders`, 'info');
+                }
+                
+                // Apply saved state (splits, shiny) to all orders
+                applyItemState();
+                
+                // Save merged orders to Firebase
+                await saveOrders();
+                
+                renderOrders();
+                updateStats();
+            } catch (error) {
+                showSyncStatus('❌ Sync failed: ' + error.message, 'error');
+            }
+        }
+        
+        function parseCSV(csvText) {
+            const rows = parseCSVWithMultiline(csvText);
+            if (rows.length < 2) return [];
+            
+            const headers = rows[0].map(h => h.trim().replace(/^"|"$/g, ''));
+            const nameIdx = headers.findIndex(h => h.toLowerCase() === 'name');
+            const detailsIdx = headers.findIndex(h => h.toLowerCase().includes('order') && h.toLowerCase().includes('detail'));
+            const timestampIdx = headers.findIndex(h => h.toLowerCase() === 'timestamp');
+            
+            const orders = [];
+            let orderNum = 1;
+            
+            for (let i = 1; i < rows.length; i++) {
+                const values = rows[i];
+                if (values.length < 6) continue;
+                
+                const timestamp = timestampIdx >= 0 ? values[timestampIdx] : '';
+                const customer = nameIdx >= 0 ? values[nameIdx] : '';
+                const orderDetails = detailsIdx >= 0 ? values[detailsIdx] : '';
+                
+                if (!customer.trim() && !orderDetails.trim()) continue;
+                
+                let orderId = `ORD-${orderNum}`;
+                if (timestamp) {
+                    const dateMatch = timestamp.match(/(\d+)\/(\d+)\/(\d+)/);
+                    if (dateMatch) {
+                        orderId = `ORD-${dateMatch[3]}${dateMatch[1].padStart(2,'0')}${dateMatch[2].padStart(2,'0')}`;
+                    }
+                }
+                orderNum++;
+                
+                orders.push({
+                    id: orderId,
+                    customer: customer.trim() || 'Unknown',
+                    status: 'Pending',
+                    items: parseOrderDetails(orderDetails),
+                    date: timestamp || new Date().toISOString().split('T')[0]
+                });
+            }
+            
+            return orders;
+        }
+        
+        function parseCSVWithMultiline(csvText) {
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < csvText.length; i++) {
+                const char = csvText[i];
+                const nextChar = csvText[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        currentField += '"';
+                        continue;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (currentField !== '' || currentRow.length > 0) {
+                        currentRow.push(currentField.trim());
+                        rows.push(currentRow);
+                        currentRow = [];
+                        currentField = '';
+                    }
+                } else {
+                    currentField += char;
+                }
+            }
+            
+            if (currentField !== '' || currentRow.length > 0) {
+                currentRow.push(currentField.trim());
+                rows.push(currentRow);
+            }
+            
+            return rows.map(row => row.map(v => v.replace(/^"|"$/g, '')));
+        }
+        
+        function parseOrderDetails(detailsText) {
+            if (!detailsText) return [];
+            const items = [];
+            const lines = detailsText.split(/[;\n]/);
+            
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+                
+                const shiny = line.toLowerCase().includes('shiny') || line.includes('✨');
+                let cleanLine = line.replace(/shiny|✨/gi, '').trim();
+                
+                let name = cleanLine, price = 0, qty = 1;
+                
+                const priceMatch = cleanLine.match(/\$(\d+\.?\d*)/);
+                if (priceMatch) {
+                    price = parseFloat(priceMatch[1]);
+                    cleanLine = cleanLine.replace(priceMatch[0], '').trim();
+                }
+                
+                const qtyMatch = cleanLine.match(/\(x(\d+)\)/i) || cleanLine.match(/x(\d+)/i);
+                if (qtyMatch) {
+                    qty = parseInt(qtyMatch[1]);
+                    cleanLine = cleanLine.replace(qtyMatch[0], '').trim();
+                }
+                
+                name = cleanLine.replace(/[-\s]*$/, '').trim();
+                
+                const n3dData = getN3DData(name);
+                const filamentColors = n3dData?.colors?.map(c => ({
+                    color: c.color,
+                    grams: c.grams || c.weight_grams || 50
+                })) || [{ color: 'Ivory White', grams: 50 }];
+                
+                items.push({
+                    id: Date.now() + Math.random(),
+                    name: name,
+                    price: price,
+                    qty: qty,
+                    shiny: shiny,
+                    status: 'Pending',
+                    filamentColors: filamentColors,
+                    pokeball: shiny ? 'shiny' : 'normal'
+                });
+            });
+            
+            return items;
+        }
+        
+        function getN3DData(itemName) {
+            if (!itemName || !n3dDesigns.length) return null;
+            
+            const normalize = (name) => name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/v\d+$/, '');
+            const searchKey = normalize(itemName);
+            
+            let match = n3dDesigns.find(d => {
+                if (!d.name) return false;
+                return normalize(d.name) === searchKey;
+            });
+            
+            if (!match) {
+                match = n3dDesigns.find(d => {
+                    if (!d.originalName) return false;
+                    return normalize(d.originalName) === searchKey;
+                });
+            }
+            
+            if (!match) {
+                match = n3dDesigns.find(d => {
+                    if (!d.name) return false;
+                    const normName = normalize(d.name);
+                    return normName.includes(searchKey) || searchKey.includes(normName);
+                });
+            }
+            
+            return match;
+        }
+        
+        function applyItemState() {
+            orders.forEach(order => {
+                const processedItems = [];
+                
+                order.items.forEach(item => {
+                    const sig = getItemSignature(order.id, item.name, item.qty);
+                    
+                    if ((itemState.shinySignatures || {})[sig]) {
+                        item.shiny = true;
+                        item.pokeball = 'shiny';
+                    }
+                    
+                    if ((itemState.splitSignatures || {})[sig] && item.qty > 1) {
+                        for (let i = 0; i < item.qty; i++) {
+                            processedItems.push({
+                                id: Date.now() + Math.random() + i,
+                                name: item.name,
+                                price: item.price / item.qty,
+                                qty: 1,
+                                shiny: item.shiny,
+                                status: item.status,
+                                filamentColors: JSON.parse(JSON.stringify(item.filamentColors)),
+                                pokeball: item.pokeball
+                            });
+                        }
+                    } else {
+                        processedItems.push(item);
+                    }
+                });
+                
+                order.items = processedItems;
+            });
+        }
+        
+        function getItemSignature(orderId, itemName, qty) {
+            const cleanName = itemName.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return `${orderId}-${cleanName}-x${qty}`;
+        }
+        
+        // Rendering
+        function renderOrders() {
+            const container = document.getElementById('ordersContainer');
+            
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>No orders found</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px; opacity: 0.7;">Tap "🔄 Sync Orders" to load</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const statusPriority = { 'Pending': 0, 'Printing': 1, 'Completed': 2 };
+            const sortedOrders = [...orders].sort((a, b) => {
+                const priorityA = statusPriority[a.status] || 0;
+                const priorityB = statusPriority[b.status] || 0;
+                return priorityA - priorityB;
+            });
+            
+            const customers = {};
+            sortedOrders.forEach(order => {
+                if (currentFilter !== 'all' && order.status !== currentFilter) return;
+                
+                const name = order.customer || 'Unknown';
+                if (!customers[name]) customers[name] = [];
+                customers[name].push(order);
+            });
+            
+            let html = '';
+            let delay = 0;
+            Object.keys(customers).sort().forEach(customer => {
+                const customerOrders = customers[customer];
+                customerOrders.sort((a, b) => {
+                    const priorityA = statusPriority[a.status] || 0;
+                    const priorityB = statusPriority[b.status] || 0;
+                    return priorityA - priorityB;
+                });
+                
+                const pending = customerOrders.filter(o => o.status === 'Pending').length;
+                const printing = customerOrders.filter(o => o.status === 'Printing').length;
+                const completed = customerOrders.filter(o => o.status === 'Completed').length;
+                
+                html += `
+                    <div class="customer-section" style="animation-delay: ${delay}ms">
+                        <div class="customer-header" onclick="toggleCustomer('${customer.replace(/'/g, "\\'")}')">
+                            <div class="customer-name">👤 ${customer}</div>
+                            <div class="customer-stats">
+                                <span>📝 ${customerOrders.length}</span>
+                                ${pending > 0 ? `<span style="color: var(--danger)">⏳${pending}</span>` : ''}
+                                ${printing > 0 ? `<span style="color: var(--warning)">🖨️${printing}</span>` : ''}
+                                ${completed > 0 ? `<span style="color: var(--info)">✅${completed}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="customer-orders expanded" id="customer-${customer.replace(/\s+/g, '-').replace(/'/g, '')}">
+                            ${customerOrders.map(order => renderOrderCard(order)).join('')}
+                        </div>
+                    </div>
+                `;
+                delay += 50;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function renderOrderCard(order) {
+            const statusClass = (order.status || 'pending').toLowerCase();
+            const orderTotal = order.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const itemCount = order.items.reduce((sum, item) => sum + item.qty, 0);
+            
+            return `
+                <div class="order-card ${statusClass}">
+                    <button class="delete-order-btn" onclick="event.stopPropagation(); deleteOrder('${order.id}')">&times;</button>
+                    <div class="order-header" onclick="toggleOrder('${order.id}')">
+                        <div>
+                            <span class="order-id">#${order.id}</span>
+                            <div class="order-meta">$${orderTotal.toFixed(2)} • ${itemCount} item${itemCount !== 1 ? 's' : ''}</div>
+                        </div>
+                        <span class="order-status status-${statusClass}">${order.status || 'Pending'}</span>
+                    </div>
+                    <div class="order-items" id="order-items-${order.id}">
+                        ${order.items.map((item, idx) => renderItemRow(order.id, item, idx)).join('')}
+                        <div style="padding: 12px; text-align: center;">
+                            <button class="btn btn-success" onclick="event.stopPropagation(); openAddItemModal('${order.id}')" style="font-size: 0.8rem; padding: 10px 18px;">
+                                <span>➕</span> Add Item
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderItemRow(orderId, item, idx) {
+            const profit = calculateItemProfit(item);
+            const canSplit = item.qty > 1;
+            const hasN3D = !(item.filamentColors.length === 1 && item.filamentColors[0].color === 'Ivory White');
+            
+            return `
+                <div class="item-row" id="item-${orderId}-${idx}" onclick="toggleItem('${orderId}', ${idx})">
+                    <div class="pokeball ${item.pokeball} ${item.shiny ? 'shiny' : ''}">
+                        <div class="pokeball-center"></div>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name">${item.name} ${item.qty > 1 ? `(x${item.qty})` : ''}</div>
+                        <div class="item-price">$${item.price.toFixed(2)} ${item.status !== 'Pending' ? '• ' + item.status : ''}</div>
+                    </div>
+                    <div class="badges">
+                        ${item.shiny ? '<span class="badge badge-shiny">✨</span>' : ''}
+                    </div>
+                </div>
+                <div class="item-expanded" id="item-expanded-${orderId}-${idx}">
+                    ${!hasN3D ? `
+                        <div class="warning-banner">
+                            <span>⚠️</span> N3D design not found - using default 50g estimate
+                        </div>
+                    ` : ''}
+                    <div class="filament-info">
+                        ${item.filamentColors.map(fc => `
+                            <div class="filament-tag">
+                                <div class="filament-dot" style="background: ${(filaments[fc.color] || {}).color || generateColorHex(fc.color)}"></div>
+                                ${fc.color}: ${fc.grams.toFixed(1)}g
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="item-stats">
+                        <div class="stat-box">
+                            <div class="stat-box-label">Grams</div>
+                            <div class="stat-box-value">${profit.totalGrams.toFixed(1)}g</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-label">Cost</div>
+                            <div class="stat-box-value cost">$${profit.filamentCost.toFixed(2)}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-label">Revenue</div>
+                            <div class="stat-box-value">$${profit.revenue.toFixed(2)}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-label">Profit</div>
+                            <div class="stat-box-value profit">$${profit.profit.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn ${item.status === 'Pending' ? 'pending active' : 'pending'}" onclick="event.stopPropagation(); updateItemStatus('${orderId}', ${idx}, 'Pending')">⏳ Pending</button>
+                        <button class="item-btn ${item.status === 'Printing' ? 'printing active' : 'printing'}" onclick="event.stopPropagation(); updateItemStatus('${orderId}', ${idx}, 'Printing')">🖨️ Printing</button>
+                        <button class="item-btn ${item.status === 'Completed' ? 'completed active' : 'completed'}" onclick="event.stopPropagation(); updateItemStatus('${orderId}', ${idx}, 'Completed')">✅ Complete</button>
+                        <button class="item-btn shiny ${item.shiny ? 'active' : ''}" onclick="event.stopPropagation(); toggleShiny('${orderId}', ${idx})">✨ Shiny</button>
+                        ${canSplit ? `<button class="item-btn split" onclick="event.stopPropagation(); splitItem('${orderId}', ${idx})">🔀 Split (x${item.qty})</button>` : ''}
+                        <button class="item-btn" onclick="event.stopPropagation(); deleteItem('${orderId}', ${idx})" style="background: rgba(239,68,68,0.2); color: #fca5a5;">🗑️ Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function calculateItemProfit(item) {
+            const totalGrams = item.filamentColors.reduce((sum, fc) => sum + fc.grams, 0);
+            const filamentCost = totalGrams * FILAMENT_COST_PER_GRAM;
+            return {
+                totalGrams,
+                filamentCost,
+                revenue: item.price,
+                profit: item.price - filamentCost
+            };
+        }
+        
+        // Actions
+        async function updateItemStatus(orderId, idx, status) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order || !order.items[idx]) return;
+            
+            const item = order.items[idx];
+            const previousStatus = item.status;
+            
+            item.status = status;
+            
+            if (status === 'Completed' && previousStatus !== 'Completed') {
+                item.filamentColors.forEach(fc => {
+                    if (filaments[fc.color]) {
+                        filaments[fc.color].amount = Math.max(0, filaments[fc.color].amount - fc.grams);
+                    }
+                });
+                await saveFilaments();
+            }
+            
+            if (order.items.every(i => i.status === 'Completed')) {
+                order.status = 'Completed';
+            } else if (order.items.some(i => i.status === 'Printing')) {
+                order.status = 'Printing';
+            } else {
+                order.status = 'Pending';
+            }
+            
+            await saveOrders();
+            renderOrders();
+            updateStats();
+            showSyncStatus(`✅ Item marked ${status}`, 'success');
+        }
+        
+        async function toggleShiny(orderId, idx) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order || !order.items[idx]) return;
+            
+            const item = order.items[idx];
+            item.shiny = !item.shiny;
+            item.pokeball = item.shiny ? 'shiny' : 'normal';
+            
+            const sig = getItemSignature(orderId, item.name, item.qty);
+            if (!itemState.shinySignatures) itemState.shinySignatures = {};
+            if (item.shiny) {
+                itemState.shinySignatures[sig] = true;
+            } else {
+                delete itemState.shinySignatures[sig];
+            }
+            
+            // Save both item state AND orders
+            await saveItemState();
+            await saveOrders();
+            
+            renderOrders();
+        }
+        
+        async function splitItem(orderId, idx) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order || !order.items[idx]) return;
+            
+            const item = order.items[idx];
+            if (item.qty <= 1) return;
+            
+            const sig = getItemSignature(orderId, item.name, item.qty);
+            if (!itemState.splitSignatures) itemState.splitSignatures = {};
+            itemState.splitSignatures[sig] = true;
+            await saveItemState();
+            
+            const newItems = [];
+            for (let i = 0; i < item.qty; i++) {
+                newItems.push({
+                    id: Date.now() + Math.random() + i,
+                    name: item.name,
+                    price: item.price / item.qty,
+                    qty: 1,
+                    shiny: item.shiny,
+                    status: item.status,
+                    filamentColors: JSON.parse(JSON.stringify(item.filamentColors)),
+                    pokeball: item.pokeball
+                });
+            }
+            
+            order.items.splice(idx, 1, ...newItems);
+            await saveOrders();
+            renderOrders();
+            showSyncStatus(`✅ Split into ${newItems.length} items`, 'success');
+        }
+        
+        async function deleteOrder(orderId) {
+            if (!confirm('Delete this order?')) return;
+            
+            if (!itemState.deletedOrders) itemState.deletedOrders = [];
+            itemState.deletedOrders.push(orderId);
+            await saveItemState();
+            
+            orders = orders.filter(o => o.id !== orderId);
+            await saveOrders();
+            renderOrders();
+            updateStats();
+            showSyncStatus('✅ Order deleted', 'success');
+        }
+        
+        async function deleteItem(orderId, idx) {
+            if (!confirm('Delete this item?')) return;
+            
+            const order = orders.find(o => o.id === orderId);
+            if (!order || !order.items[idx]) return;
+            
+            order.items.splice(idx, 1);
+            
+            if (order.items.length === 0) {
+                await deleteOrder(orderId);
+                return;
+            }
+            
+            if (order.items.every(i => i.status === 'Completed')) {
+                order.status = 'Completed';
+            } else if (order.items.some(i => i.status === 'Printing')) {
+                order.status = 'Printing';
+            } else {
+                order.status = 'Pending';
+            }
+            
+            await saveOrders();
+            renderOrders();
+            updateStats();
+            showSyncStatus('✅ Item deleted', 'success');
+        }
+        
+        // Add Item
+        function openAddItemModal(orderId) {
+            currentAddOrderId = orderId;
+            document.getElementById('addItemName').value = '';
+            document.getElementById('addItemPrice').value = '';
+            document.getElementById('addItemQty').value = '1';
+            document.getElementById('addItemModal').classList.add('active');
+        }
+        
+        async function confirmAddItem() {
+            if (!currentAddOrderId) return;
+            
+            const name = document.getElementById('addItemName').value.trim();
+            const price = parseFloat(document.getElementById('addItemPrice').value) || 0;
+            const qty = parseInt(document.getElementById('addItemQty').value) || 1;
+            
+            if (!name) {
+                showSyncStatus('❌ Please enter an item name', 'error');
+                return;
+            }
+            
+            const order = orders.find(o => o.id === currentAddOrderId);
+            if (!order) return;
+            
+            const n3dData = getN3DData(name);
+            const filamentColors = n3dData?.colors?.map(c => ({
+                color: c.color,
+                grams: c.grams || c.weight_grams || 50
+            })) || [{ color: 'Ivory White', grams: 50 }];
+            
+            order.items.push({
+                id: Date.now() + Math.random(),
+                name: name,
+                price: price,
+                qty: qty,
+                shiny: false,
+                status: 'Pending',
+                filamentColors: filamentColors,
+                pokeball: 'normal'
+            });
+            
+            // Save orders to Firebase
+            await saveOrders();
+            
+            closeModal('addItemModal');
+            renderOrders();
+            updateStats();
+            showSyncStatus(`✅ Added ${name} to order`, 'success');
+        }
+        
+        async function saveOrders() {
+            if (!db) return;
+            try {
+                await db.collection('pokeprint').doc('orders').set({
+                    orders: orders,
+                    lastUpdated: new Date().toISOString()
+                });
+            } catch (err) {
+                console.log('Save orders error:', err);
+            }
+        }
+        
+        // Revenue Modal
+        function openRevenueModal() {
+            renderRevenue();
+            document.getElementById('revenueModal').classList.add('active');
+        }
+        
+        function renderRevenue() {
+            const container = document.getElementById('revenueContainer');
+            
+            let totalRevenue = 0;
+            let totalCost = 0;
+            let completedRevenue = 0;
+            let pendingRevenue = 0;
+            
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    const itemRevenue = item.price * item.qty;
+                    const itemCost = item.filamentColors.reduce((sum, fc) => sum + fc.grams, 0) * FILAMENT_COST_PER_GRAM * item.qty;
+                    
+                    totalRevenue += itemRevenue;
+                    totalCost += itemCost;
+                    
+                    if (item.status === 'Completed') {
+                        completedRevenue += itemRevenue;
+                    } else {
+                        pendingRevenue += itemRevenue;
+                    }
+                });
+            });
+            
+            const totalProfit = totalRevenue - totalCost;
+            
+            container.innerHTML = `
+                <div style="padding: 10px;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 24px;">
+                        <div class="revenue-card success">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Total Revenue</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--success);">$${totalRevenue.toFixed(2)}</div>
+                        </div>
+                        <div class="revenue-card info">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Completed</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--info);">$${completedRevenue.toFixed(2)}</div>
+                        </div>
+                        <div class="revenue-card warning">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Pending</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--warning);">$${pendingRevenue.toFixed(2)}</div>
+                        </div>
+                        <div class="revenue-card pink">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Est. Profit</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--pink);">$${totalProfit.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-card); border-radius: 16px; padding: 18px; border: 1px solid var(--border);">
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.05em;">Revenue by Customer</div>
+                        ${getRevenueByCustomer()}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getRevenueByCustomer() {
+            const customerRevenue = {};
+            
+            orders.forEach(order => {
+                const customer = order.customer || 'Unknown';
+                if (!customerRevenue[customer]) customerRevenue[customer] = 0;
+                order.items.forEach(item => {
+                    customerRevenue[customer] += item.price * item.qty;
+                });
+            });
+            
+            const sorted = Object.entries(customerRevenue).sort((a, b) => b[1] - a[1]);
+            
+            return sorted.map(([customer, revenue]) => `
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border);">
+                    <span style="font-weight: 500;">${customer}</span>
+                    <span style="color: var(--success); font-weight: 700;">$${revenue.toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Filament Management
+        function renderFilaments() {
+            const container = document.getElementById('filamentContainer');
+            const colors = Object.keys(filaments).sort();
+            
+            if (colors.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <p>No filament colors loaded.</p>
+                        <p style="margin-top: 10px;">Tap "🎨 Sync N3D" to load colors.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = colors.map(color => {
+                const f = filaments[color];
+                const isLow = f.amount <= LOW_STOCK_THRESHOLD;
+                return `
+                    <div class="filament-card ${isLow ? 'low-stock' : ''}">
+                        <div class="filament-color" style="background: ${f.color}"></div>
+                        <div class="filament-name">${color}</div>
+                        <div class="filament-amount">${f.amount}g</div>
+                        <div class="filament-actions">
+                            <button class="btn-tiny" style="background: var(--success); color: white;" onclick="addFilament('${color}', 1000)">+1000g</button>
+                            <button class="btn-tiny" style="background: var(--danger); color: white;" onclick="subtractFilament('${color}', 50)">-50g</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        async function addFilament(color, amount) {
+            if (!filaments[color]) {
+                filaments[color] = { amount: 0, color: generateColorHex(color) };
+            }
+            filaments[color].amount += amount;
+            await saveFilaments();
+            renderFilaments();
+            showSyncStatus(`✅ Added ${amount}g to ${color}`, 'success');
+        }
+        
+        async function subtractFilament(color, amount) {
+            if (filaments[color]) {
+                filaments[color].amount = Math.max(0, filaments[color].amount - amount);
+                await saveFilaments();
+                renderFilaments();
+            }
+        }
+        
+        function renderShoppingList() {
+            const list = document.getElementById('shoppingList');
+            const lowStock = Object.keys(filaments)
+                .filter(color => filaments[color].amount <= LOW_STOCK_THRESHOLD)
+                .sort((a, b) => filaments[a].amount - filaments[b].amount);
+            
+            if (lowStock.length === 0) {
+                list.innerHTML = '<li style="text-align: center; color: var(--text-secondary); padding: 30px;">🎉 All stocked up!</li>';
+                return;
+            }
+            
+            list.innerHTML = lowStock.map(color => `
+                <li class="shopping-item">
+                    <span style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 22px; height: 22px; border-radius: 50%; background: ${filaments[color].color}; border: 2px solid rgba(255,255,255,0.3);"></div>
+                        ${color}
+                    </span>
+                    <span style="color: var(--danger); font-weight: 700;">${filaments[color].amount}g</span>
+                </li>
+            `).join('');
+        }
+        
+        // Utilities
+        function generateColorHex(colorName) {
+            const colorMap = {
+                'Ivory White': '#FFFFF0', 'Charcoal Black': '#36454F', 'Scarlet Red': '#FF2400',
+                'Marine Blue': '#0077BE', 'Lilac Purple': '#C8A2C8', 'Sakura Pink': '#FFB7C5',
+                'Turquoise': '#40E0D0', 'Mandarin Orange': '#F37A48', 'Sunflower Yellow': '#FFC512',
+                'Grass Green': '#7CFC00', 'Ice Blue': '#B0E0E6', 'Sky Blue': '#87CEEB',
+                'Ash Gray': '#B2BEB5', 'Dark Gray': '#A9A9A9', 'Light Gray': '#D3D3D3',
+                'Nardo Gray': '#686A6C', 'Desert Tan': '#C2B280', 'Caramel': '#FFD59A',
+                'Latte Brown': '#C5A582', 'Dark Brown': '#654321', 'Bone White': '#E3DAC9',
+                'Beige': '#F5F5DC', 'Hot Pink': '#FF69B4', 'Purple': '#800080',
+                'Indigo Purple': '#4B0082', 'Gold': '#FFD700', 'Silver': '#C0C0C0',
+                'Bambu Green': '#8FBC8F', 'Apple Green': '#8DB600', 'Lemon Yellow': '#FFF44F',
+                'Mistletoe Green': '#3B7A57', 'Dark Green': '#006400', 'Dark Blue': '#00008B',
+                'Cobalt Blue': '#0047AB', 'Blue Grey': '#6699CC', 'Blue': '#0000FF',
+                'Red': '#FF0000', 'Yellow': '#FFFF00', 'Orange': '#FFA500',
+                'Pink': '#FFC0CB', 'Green': '#008000', 'Cyan': '#00FFFF',
+                'Magenta': '#FF00FF', 'Black': '#000000', 'White': '#FFFFFF', 'Gray': '#808080'
+            };
+            
+            if (colorMap[colorName]) return colorMap[colorName];
+            
+            for (const [key, value] of Object.entries(colorMap)) {
+                if (colorName.toLowerCase().includes(key.toLowerCase()) || 
+                    key.toLowerCase().includes(colorName.toLowerCase())) {
+                    return value;
+                }
+            }
+            
+            let hash = 0;
+            for (let i = 0; i < colorName.length; i++) {
+                hash = colorName.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+            return '#' + '00000'.substring(0, 6 - c.length) + c;
+        }
+        
+        function updateStats() {
+            const pending = orders.filter(o => o.status === 'Pending').length;
+            const printing = orders.filter(o => o.status === 'Printing').length;
+            const completed = orders.filter(o => o.status === 'Completed').length;
+            const filamentColors = Object.keys(filaments).length;
+            const lowStock = Object.keys(filaments).filter(c => filaments[c].amount <= LOW_STOCK_THRESHOLD).length;
+            const n3dDesignsCount = n3dDesigns.length;
+            
+            let totalRevenue = 0;
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    totalRevenue += item.price * item.qty;
+                });
+            });
+            
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('printingCount').textContent = printing;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('filamentCount').textContent = filamentColors;
+            document.getElementById('lowStockCount').textContent = lowStock;
+            document.getElementById('shoppingCount').textContent = lowStock;
+            document.getElementById('n3dCount').textContent = n3dDesignsCount;
+            document.getElementById('revenueCount').textContent = '$' + totalRevenue.toFixed(0);
+        }
+        
+        // UI Helpers
+        function toggleCustomer(customer) {
+            const safeId = customer.replace(/\s+/g, '-').replace(/'/g, '');
+            const el = document.getElementById(`customer-${safeId}`);
+            if (el) el.classList.toggle('expanded');
+        }
+        
+        function toggleOrder(orderId) {
+            const el = document.getElementById(`order-items-${orderId}`);
+            if (el) el.classList.toggle('expanded');
+        }
+        
+        function toggleItem(orderId, idx) {
+            const row = document.getElementById(`item-${orderId}-${idx}`);
+            const expanded = document.getElementById(`item-expanded-${orderId}-${idx}`);
+            if (row && expanded) {
+                row.classList.toggle('expanded');
+                expanded.classList.toggle('visible');
+            }
+        }
+        
+        function filterOrders(status) {
+            currentFilter = status === currentFilter ? 'all' : status;
+            renderOrders();
+        }
+        
+        function openFilamentModal() {
+            renderFilaments();
+            document.getElementById('filamentModal').classList.add('active');
+        }
+        
+        function openShoppingModal() {
+            renderShoppingList();
+            document.getElementById('shoppingModal').classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function showSyncStatus(message, type) {
+            const el = document.getElementById('syncStatus');
+            el.textContent = message;
+            el.className = `sync-status ${type}`;
+            
+            // Trigger animation
+            requestAnimationFrame(() => {
+                el.classList.add('show');
+            });
+            
+            if (type !== 'info') {
+                setTimeout(() => {
+                    el.classList.remove('show');
+                }, 3000);
+            }
+        }
+        
+        // Close modals on outside click
+        window.onclick = (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        };
+        
+        // Initialization
+        document.addEventListener('DOMContentLoaded', async () => {
+            initFirebase();
+            
+            document.getElementById('ordersContainer').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading saved orders...</p>
+                </div>
+            `;
+            
+            // Wait for Firebase to load saved orders first
+            setTimeout(async () => {
+                try {
+                    // Load saved orders from Firebase first
+                    const ordersDoc = await db.collection('pokeprint').doc('orders').get();
+                    if (ordersDoc.exists && ordersDoc.data().orders) {
+                        orders = ordersDoc.data().orders;
+                        applyItemState();
+                        renderOrders();
+                        updateStats();
+                        showSyncStatus(`✅ Loaded ${orders.length} saved orders`, 'success');
+                    }
+                    
+                    // Then sync N3D and new orders from Sheets
+                    await syncN3DDesigns();
+                    await syncOrders();
+                } catch (err) {
+                    console.error('Auto-sync error:', err);
+                    showSyncStatus('⚠️ Some syncs failed', 'error');
+                }
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
