@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-01T06:14:28.465987Z",
+  "lastUpdated": "2026-04-03T05:52:37.656426Z",
   "totalDesigns": 236,
   "designs": [
     {
@@ -19512,6 +19512,16 @@
       },
       "filaments": [
         {
+          "filament_id": 17,
+          "color": "Desert Tan",
+          "series": "PLA Matte",
+          "hex_color": "#D2BBA6",
+          "img_swatch": "https://seiycbyxhnyejmqkcxqr.supabase.co/storage/v1/object/public/designs/site-files/bambu/filament_thumbnails/17-desert-tan.webp",
+          "weight_grams": 25.5,
+          "product_url": "https://us.store.bambulab.com/products/pla-matte?p=W3sicHJvcGVydHlLZXkiOiJDb2xvciIsInByb3BlcnR5VmFsdWUiOiJNYXR0ZSBEZXNlcnQgVGFuICgxMTQwMSkifSx7InByb3BlcnR5S2V5IjoiVHlwZSIsInByb3BlcnR5VmFsdWUiOiIifSx7InByb3BlcnR5S2V5IjoiU2l6ZSIsInByb3BlcnR5VmFsdWUiOiIxa2cifV0=",
+          "affiliate_url": "https://us.store.bambulab.com/products/pla-matte?p=W3sicHJvcGVydHlLZXkiOiJDb2xvciIsInByb3BlcnR5VmFsdWUiOiJNYXR0ZSBEZXNlcnQgVGFuICgxMTQwMSkifSx7InByb3BlcnR5S2V5IjoiVHlwZSIsInByb3BlcnR5VmFsdWUiOiIifSx7InByb3BlcnR5S2V5IjoiU2l6ZSIsInByb3BlcnR5VmFsdWUiOiIxa2cifV0=&sv1=affiliate&sv_campaign_id=2034679&utm_source=ShareASale&utm_medium=Affiliate&utm_campaign=2034679&utm_term=0&sscid=46345_1763586269_e310e22f88aee3e7185e3e68beb989e6&awc=46345_1763586269_e310e22f88aee3e7185e3e68beb989e6"
+        },
+        {
           "filament_id": 4,
           "color": "Mandarin Orange",
           "series": "PLA Matte",
@@ -19530,16 +19540,6 @@
           "weight_grams": 1.46,
           "product_url": "https://us.store.bambulab.com/products/pla-matte?p=W3sicHJvcGVydHlLZXkiOiJDb2xvciIsInByb3BlcnR5VmFsdWUiOiJNYXR0ZSBEYXJrIEJyb3duICgxMTgwMSkifSx7InByb3BlcnR5S2V5IjoiVHlwZSIsInByb3BlcnR5VmFsdWUiOiIifSx7InByb3BlcnR5S2V5IjoiU2l6ZSIsInByb3BlcnR5VmFsdWUiOiIxa2cifV0=",
           "affiliate_url": "https://us.store.bambulab.com/products/pla-matte?p=W3sicHJvcGVydHlLZXkiOiJDb2xvciIsInByb3BlcnR5VmFsdWUiOiJNYXR0ZSBEYXJrIEJyb3duICgxMTgwMSkifSx7InByb3BlcnR5S2V5IjoiVHlwZSIsInByb3BlcnR5VmFsdWUiOiIifSx7InByb3BlcnR5S2V5IjoiU2l6ZSIsInByb3BlcnR5VmFsdWUiOiIxa2cifV0=&sv1=affiliate&sv_campaign_id=2034679&utm_source=ShareASale&utm_medium=Affiliate&utm_campaign=2034679&utm_term=0&sscid=46345_1763586273_0c96270187ff2f104ffba356ac8a4124&awc=46345_1763586273_0c96270187ff2f104ffba356ac8a4124"
-        },
-        {
-          "filament_id": 27,
-          "color": "Beige",
-          "series": "PLA Basic",
-          "hex_color": "#F7E6DE",
-          "img_swatch": "https://seiycbyxhnyejmqkcxqr.supabase.co/storage/v1/object/public/designs/site-files/bambu/filament_thumbnails/27-beige.webp",
-          "weight_grams": 25.5,
-          "product_url": "https://us.store.bambulab.com/products/pla-basic-filament?p=W3sicHJvcGVydHlLZXkiOiJDb2xvciIsInByb3BlcnR5VmFsdWUiOiJCZWlnZSAoMTAyMDEpIn0seyJwcm9wZXJ0eUtleSI6IlR5cGUiLCJwcm9wZXJ0eVZhbHVlIjoiIn0seyJwcm9wZXJ0eUtleSI6IlNpemUiLCJwcm9wZXJ0eVZhbHVlIjoiMWtnIn1d",
-          "affiliate_url": "https://us.store.bambulab.com/products/pla-basic-filament?p=W3sicHJvcGVydHlLZXkiOiJDb2xvciIsInByb3BlcnR5VmFsdWUiOiJCZWlnZSAoMTAyMDEpIn0seyJwcm9wZXJ0eUtleSI6IlR5cGUiLCJwcm9wZXJ0eVZhbHVlIjoiIn0seyJwcm9wZXJ0eUtleSI6IlNpemUiLCJwcm9wZXJ0eVZhbHVlIjoiMWtnIn1d&sv1=affiliate&sv_campaign_id=2034679&utm_source=ShareASale&utm_medium=Affiliate&utm_campaign=2034679&utm_term=0&sscid=46345_1763586278_63d47073e4d9c78cbfd7efa888693797&awc=46345_1763586278_63d47073e4d9c78cbfd7efa888693797"
         },
         {
           "filament_id": 25,
