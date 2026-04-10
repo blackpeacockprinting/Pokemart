@@ -28,12 +28,15 @@ function renderFilters(designs){
   }).join('');
 }
 
+var searchQuery='';
 function setFilter(f){activeFilter=f;renderFilters(allDesigns);renderProducts();}
+function searchDesigns(q){searchQuery=q.toLowerCase();renderProducts();}
 
 function renderProducts(){
   var filtered=activeFilter==='all'?allDesigns:allDesigns.filter(function(d){
     return d.pokemon&&d.pokemon.types&&d.pokemon.types.map(function(t){return t.toLowerCase();}).indexOf(activeFilter)>=0;
   });
+  if(searchQuery){filtered=filtered.filter(function(d){var name=d.pokemon?d.pokemon.name.toLowerCase():d.title.toLowerCase();return name.indexOf(searchQuery)>=0;});}
   if(!filtered.length){document.getElementById('shop-content').innerHTML='<div class="error-state"><p class="error-msg">No designs found for this type.</p></div>';return;}
   var html=filtered.map(function(d){
     var price=getPrice(d.total_weight_grams||0);

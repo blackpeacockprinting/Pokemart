@@ -151,6 +151,10 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
 .spin{width:28px;height:28px;border:2px solid rgba(201,168,76,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem}
 .email-err{background:rgba(226,75,74,0.08);border:0.5px solid rgba(226,75,74,0.3);border-radius:6px;padding:12px 14px;font-size:13px;color:#f09595;margin-top:1rem;line-height:1.6}
 @media(max-width:600px){nav ul{display:none}.panel{width:100%;right:-100%}.hero h1{font-size:32px}}
+.search-bar{margin-bottom:1rem}
+.search-bar input{width:100%;background:var(--surface);border:0.5px solid rgba(201,168,76,0.22);border-radius:4px;padding:12px 16px;color:#e8e4dc;font-size:15px;font-family:inherit;outline:none;transition:border-color 0.2s}
+.search-bar input:focus{border-color:var(--gold)}
+.search-bar input::placeholder{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -186,7 +190,8 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
   <p class="section-label">The Collection</p>
   <h2 class="section-title">All figures</h2>
   <p class="section-sub">Designs by N3D Melbourne - Local pickup only - Pay on delivery</p>
-  <div class="filter-bar" id="filter-bar"></div>
+  <div class="search-bar"><input type="text" id="search-input" placeholder="Search Pokemon..." oninput="searchDesigns(this.value)"></div>
+<div class="filter-bar" id="filter-bar"></div>
   <div id="shop-content"><div class="loading-state"><div class="loading-spinner"></div><p>Loading designs...</p></div></div>
 </div>
 <div class="n3d-banner" id="about">
