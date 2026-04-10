@@ -40,7 +40,7 @@ function renderProducts(){
     var type=d.pokemon&&d.pokemon.types&&d.pokemon.types[0]?d.pokemon.types[0].toLowerCase():'normal';
     var s=ts(type);
     var desc=d.pokemon&&d.pokemon.description?d.pokemon.description.substring(0,90)+'...':'A precision multi-colour 3D printed Pokemon Poke Ball fusion.';
-    var pokeName=d.pokemon?d.pokemon.name:d.title;
+    var rawName=d.pokemon?d.pokemon.name:d.title;var pokeName=rawName.charAt(0).toUpperCase()+rawName.slice(1);
     var photo=MY_PHOTOS[d.slug]||'';
     var imgContent=photo?'<img src="'+photo+'" alt="'+pokeName+'" loading="lazy">'
       :'<div class="poke-placeholder">'+ballSVG(type)+'</div>';
@@ -50,7 +50,7 @@ function renderProducts(){
       +'<div class="type-badge" style="background:'+s.bg+';color:'+s.text+';border:0.5px solid '+s.border+'">'+type+'</div>'
       +'</div>'
       +'<div class="product-info">'
-      +'<p class="product-name">'+pokeName+' Pokeball</p>'
+      +'<p class="product-name">'+pokeName+'</p>'
       +'<p class="product-desc">'+desc+'</p>'
       +'<div class="product-footer">'
       +'<span class="product-price">$'+price+'</span>'
