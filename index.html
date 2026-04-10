@@ -14,7 +14,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);border-bott
 .logo{font-size:17px;font-weight:500;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase}
 .logo span{color:#e8e4dc}
 nav ul{display:flex;gap:2rem;list-style:none}
-nav ul a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;transition:color 0.2s}
+nav ul a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:0.06em;text-transform:uppercase}
 nav ul a:hover{color:var(--gold)}
 .nav-cart{background:var(--gold);color:#0a0a0f;border:none;padding:7px 18px;border-radius:4px;font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:6px}
 .nav-cart:hover{background:var(--gold-light)}
@@ -43,12 +43,11 @@ nav ul a:hover{color:var(--gold)}
 .filter-btn{background:transparent;color:var(--muted);border:0.5px solid rgba(201,168,76,0.2);padding:6px 14px;border-radius:4px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
 .filter-btn:hover,.filter-btn.active{background:var(--gold);color:#0a0a0f;border-color:var(--gold)}
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
-.product-card{background:var(--surface);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color 0.2s,transform 0.2s;cursor:pointer}
+.product-card{background:var(--surface);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color 0.2s,transform 0.2s}
 .product-card:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
 .product-img{aspect-ratio:1/1;background:#0d0d14;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .product-img img{width:100%;height:100%;object-fit:cover}
 .poke-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%}
-.poke-dex{font-size:11px;color:var(--muted);letter-spacing:0.1em}
 .type-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;padding:3px 8px;border-radius:3px}
 .product-info{padding:14px 16px 16px}
 .product-name{font-size:15px;font-weight:500;color:#fff;margin-bottom:4px}
@@ -161,7 +160,7 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
   <ul>
     <li><a href="#shop">Shop</a></li>
     <li><a href="#about">About</a></li>
-    <li><a href="/cdn-cgi/l/email-protection#760f19030436131b171f1a5815191b">Contact</a></li>
+    <li><a href="mailto:your@email.com">Contact</a></li>
   </ul>
   <button class="nav-cart" onclick="openCart()">Cart <span class="cart-count" id="cart-count">0</span></button>
 </nav>
@@ -188,7 +187,7 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
   <h2 class="section-title">All figures</h2>
   <p class="section-sub">Designs by N3D Melbourne - Local pickup only - Pay on delivery</p>
   <div class="filter-bar" id="filter-bar"></div>
-  <div id="shop-content"><div class="loading-state"><div class="loading-spinner"></div><p id="load-status">Not started yet</p><br><button onclick="document.getElementById('load-status').textContent='BUTTON CLICKED'" style="background:#c9a84c;color:#000;border:none;padding:10px 20px;font-size:16px;cursor:pointer;border-radius:4px;margin-top:1rem">TEST</button></div></div>
+  <div id="shop-content"><div class="loading-state"><div class="loading-spinner"></div><p>Loading designs...</p></div></div>
 </div>
 <div class="n3d-banner" id="about">
   <div class="n3d-inner">
@@ -207,7 +206,7 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
 <footer>
   <div class="footer-logo">Black Peacock Printing</div>
   <p class="footer-credit">Figures based on designs by <a href="https://n3dmelbourne.com" target="_blank">N3D Melbourne</a> - Printed under commercial licence</p>
-  <div class="footer-links"><a href="#shop">Shop</a><a href="#about">About</a><a href="/cdn-cgi/l/email-protection#ef96809a9daf8a828e8683c18c8082">Contact</a></div>
+  <div class="footer-links"><a href="#shop">Shop</a><a href="#about">About</a><a href="mailto:your@email.com">Contact</a></div>
   <p class="footer-copy">2026 Black Peacock Printing - All rights reserved</p>
 </footer>
 <div class="panel" id="panel">
@@ -223,14 +222,13 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
   <div class="pbody" id="pbody"></div>
   <div class="pfoot" id="pfoot"></div>
 </div>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 var N3D_API_KEY = 'n3d_sk_q-FLJrMtYAqgGivAMEgrstEjgZdfQkXG';
 var EMAILJS_PUBLIC = 'vO1JLR3TEoMLqHqhU';
 var EMAILJS_SERVICE = 'service_chzr6eo';
 var EMAILJS_TEMPLATE = 'template_w2ct94l';
 var FIREBASE_FN_URL = 'https://submitorder-mglznpa3zq-uc.a.run.app';
 var FIREBASE_DESIGNS_URL = 'https://getdesigns-mglznpa3zq-uc.a.run.app';
-
 var MY_PHOTOS = {};
 
 function getPrice(g){return g<=149?8:g<=249?10:12;}
@@ -245,11 +243,6 @@ return ‘<svg width="72" height="72" viewBox="0 0 72 72" fill="none"><circle cx
 
 var allDesigns=[],activeFilter=‘all’,cart=[],info={},step=‘cart’;
 
-function setStatus(msg){
-var el=document.getElementById(‘load-status’);
-if(el)el.textContent=msg;
-}
-
 function getFilters(designs){
 var types=new Set();
 designs.forEach(function(d){if(d.pokemon&&d.pokemon.types)d.pokemon.types.forEach(function(t){types.add(t.toLowerCase());});});
@@ -257,53 +250,63 @@ return[‘all’].concat(Array.from(types).sort());
 }
 
 function renderFilters(designs){
-document.getElementById(‘filter-bar’).innerHTML=getFilters(designs).map(function(f){return’<button class="filter-btn '+(f===activeFilter?'active':'')+'" onclick="setFilter(\''+f+'\')">’+(f===‘all’?‘All types’:f)+’</button>’;}).join(’’);
+document.getElementById(‘filter-bar’).innerHTML=getFilters(designs).map(function(f){
+return ‘<button class="filter-btn '+(f===activeFilter?'active':'')+'" onclick="setFilter(\''+f+'\')">’+(f===‘all’?‘All types’:f)+’</button>’;
+}).join(’’);
 }
 
 function setFilter(f){activeFilter=f;renderFilters(allDesigns);renderProducts();}
 
 function renderProducts(){
-var filtered=activeFilter===‘all’?allDesigns:allDesigns.filter(function(d){return d.pokemon&&d.pokemon.types&&d.pokemon.types.map(function(t){return t.toLowerCase();}).includes(activeFilter);});
+var filtered=activeFilter===‘all’?allDesigns:allDesigns.filter(function(d){
+return d.pokemon&&d.pokemon.types&&d.pokemon.types.map(function(t){return t.toLowerCase();}).indexOf(activeFilter)>=0;
+});
 if(!filtered.length){document.getElementById(‘shop-content’).innerHTML=’<div class="error-state"><p class="error-msg">No designs found for this type.</p></div>’;return;}
 var html=filtered.map(function(d){
 var price=getPrice(d.total_weight_grams||0);
 var type=d.pokemon&&d.pokemon.types&&d.pokemon.types[0]?d.pokemon.types[0].toLowerCase():‘normal’;
 var s=ts(type);
-var desc=d.pokemon&&d.pokemon.description?d.pokemon.description.substring(0,90)+(d.pokemon.description.length>90?’…’:’’):‘A precision multi-colour 3D printed Pokemon Poke Ball fusion.’;
-var dexNum=d.pokemon?String(d.pokemon.pokedex_number).padStart(4,‘0’):’????’;
+var desc=d.pokemon&&d.pokemon.description?d.pokemon.description.substring(0,90)+’…’:‘A precision multi-colour 3D printed Pokemon Poke Ball fusion.’;
 var pokeName=d.pokemon?d.pokemon.name:d.title;
 var photo=MY_PHOTOS[d.slug]||’’;
 var imgContent=photo?’<img src="'+photo+'" alt="'+pokeName+'" loading="lazy">’
-:’<div class="poke-placeholder">’+ballSVG(type)+’<span class="poke-dex">#’+dexNum+’</span></div>’;
-return ‘<div class="product-card"><div class="product-img">’+imgContent+’<div class="type-badge" style="background:'+s.bg+';color:'+s.text+';border:0.5px solid '+s.border+'">’+type+’</div></div><div class="product-info"><p class="product-name">’+pokeName+’ Pokeball</p><p class="product-desc">’+desc+’</p><div class="product-footer"><span class="product-price">$’+price+’</span><button class="add-btn" onclick="addToCart(\''+d.slug+'\','+price+',\''+pokeName.replace(/'/g,'\\\'')+'\',' +'\''+photo+'\')">Add to cart</button></div></div></div>’;
+:’<div class="poke-placeholder">’+ballSVG(type)+’</div>’;
+var safeName=pokeName.replace(/\/g,’\\’).replace(/’/g,”\’”);
+return ‘<div class="product-card">’
++’<div class="product-img">’+imgContent
++’<div class="type-badge" style="background:'+s.bg+';color:'+s.text+';border:0.5px solid '+s.border+'">’+type+’</div>’
++’</div>’
++’<div class="product-info">’
++’<p class="product-name">’+pokeName+’ Pokeball</p>’
++’<p class="product-desc">’+desc+’</p>’
++’<div class="product-footer">’
++’<span class="product-price">$’+price+’</span>’
++’<button class="add-btn" onclick="addToCart(\''+d.slug+'\','+price+',\''+safeName+'\',\''+photo+'\')">Add to cart</button>’
++’</div></div></div>’;
 }).join(’’);
 document.getElementById(‘shop-content’).innerHTML=’<div class="products-grid">’+html+’</div>’;
 }
 
 function showError(msg){
-document.getElementById(‘shop-content’).innerHTML=’<div class="error-state"><p class="error-title">Could not load designs</p><p class="error-msg">’+msg+’</p><button class="retry-btn" onclick="document.getElementById('load-status').textContent='BUTTON CLICKED'">Try again</button></div>’;
+document.getElementById(‘shop-content’).innerHTML=’<div class="error-state"><p class="error-title">Could not load designs</p><p class="error-msg">’+msg+’</p><button class="retry-btn" onclick="loadDesigns()">Try again</button></div>’;
 }
 
 function loadDesigns(){
-document.getElementById(‘shop-content’).innerHTML=’<div class="loading-state"><div class="loading-spinner"></div><p id="load-status">Starting…</p></div>’;
-setStatus(’Fetching from: ’+FIREBASE_DESIGNS_URL);
+document.getElementById(‘shop-content’).innerHTML=’<div class="loading-state"><div class="loading-spinner"></div><p>Loading designs…</p></div>’;
 var xhr=new XMLHttpRequest();
 xhr.open(‘GET’,FIREBASE_DESIGNS_URL,true);
 xhr.setRequestHeader(‘X-Api-Key’,N3D_API_KEY);
 xhr.timeout=30000;
 xhr.onload=function(){
-setStatus(’Response: ’+xhr.status);
 if(xhr.status!==200){showError(’HTTP ’+xhr.status);return;}
-setStatus(‘Parsing…’);
 var data;
 try{data=JSON.parse(xhr.responseText);}catch(e){showError(’Parse error: ’+e.message);return;}
 allDesigns=data.data||[];
-setStatus(‘Got ‘+allDesigns.length+’ designs’);
-if(!allDesigns.length){showError(‘0 designs returned’);return;}
+if(!allDesigns.length){showError(‘No designs found’);return;}
 renderFilters(allDesigns);
 renderProducts();
 };
-xhr.onerror=function(){showError(‘Network error - request failed’);};
+xhr.onerror=function(){showError(‘Network error - could not connect’);};
 xhr.ontimeout=function(){showError(‘Request timed out after 30s’);};
 xhr.send();
 }
@@ -313,7 +316,8 @@ function count(){return cart.reduce(function(s,i){return s+i.qty;},0);}
 function genRef(){return ‘BPP-’+Date.now().toString(36).toUpperCase().slice(-6);}
 
 function addToCart(slug,price,name,photo){
-var existing=cart.find(function(i){return i.slug===slug;});
+var existing=null;
+for(var i=0;i<cart.length;i++){if(cart[i].slug===slug){existing=cart[i];break;}}
 if(existing){existing.qty++;}else{cart.push({slug:slug,price:price,name:name,photo:photo,qty:1});}
 document.getElementById(‘cart-count’).textContent=count();
 openCart();
@@ -324,12 +328,13 @@ function closeCart(){document.getElementById(‘panel’).classList.remove(‘op
 
 function setStep(s){
 step=s;
-[‘cart’,‘details’,‘confirm’].forEach(function(x,idx){
-var t=document.getElementById(‘t’+(idx+1));
+var steps=[‘cart’,‘details’,‘confirm’];
+for(var i=0;i<steps.length;i++){
+var t=document.getElementById(‘t’+(i+1));
 t.className=‘stab’;
-if(x===s)t.classList.add(‘active’);
-else if((s===‘details’&&x===‘cart’)||(s===‘confirm’&&x!==‘confirm’))t.classList.add(‘done’);
-});
+if(steps[i]===s)t.classList.add(‘active’);
+else if((s===‘details’&&steps[i]===‘cart’)||(s===‘confirm’&&steps[i]!==‘confirm’))t.classList.add(‘done’);
+}
 document.getElementById(‘ptitle’).textContent=s===‘cart’?‘Your Cart’:s===‘details’?‘Your Details’:‘Confirm Order’;
 document.getElementById(‘steps’).style.display=‘flex’;
 renderStep();
@@ -348,18 +353,27 @@ B.innerHTML=’<div style="text-align:center;padding:4rem 0;color:var(--muted)">
 F.innerHTML=’<button class="btn-gold" onclick="closeCart()">Browse collection</button>’;
 return;
 }
-var items=cart.map(function(i){return ‘<div class="citem"><div class="cthumb">’+(i.photo?’<img src="'+i.photo+'" alt="'+i.name+'">’:i.name.slice(0,3).toUpperCase())+’</div><div class="cdetail"><p class="cname">’+i.name+’ Pokeball</p><p class="csub">$’+i.price+’ each</p></div><div class="cright"><span class="cprice">$’+(i.price*i.qty).toFixed(2)+’</span><div class="qrow"><button class="qbtn" onclick="chgQty(\''+i.slug+'\',-1)">-</button><span class="qnum">’+i.qty+’</span><button class="qbtn" onclick="chgQty(\''+i.slug+'\',1)">+</button></div><button class="rmbtn" onclick="rmItem(\''+i.slug+'\')">Remove</button></div></div>’;}).join(’’);
+var items=’’;
+for(var i=0;i<cart.length;i++){
+var it=cart[i];
+items+=’<div class="citem"><div class="cthumb">’+(it.photo?’<img src="'+it.photo+'" alt="'+it.name+'">’:it.name.slice(0,3).toUpperCase())+’</div><div class="cdetail"><p class="cname">’+it.name+’ Pokeball</p><p class="csub">$’+it.price+’ each</p></div><div class="cright"><span class="cprice">$’+(it.price*it.qty).toFixed(2)+’</span><div class="qrow"><button class="qbtn" onclick="chgQty(\''+it.slug+'\',-1)">-</button><span class="qnum">’+it.qty+’</span><button class="qbtn" onclick="chgQty(\''+it.slug+'\',1)">+</button></div><button class="rmbtn" onclick="rmItem(\''+it.slug+'\')">Remove</button></div></div>’;
+}
 B.innerHTML=items+’<div class="summary"><div class="srow"><span>Subtotal (’+count()+’ item’+(count()!==1?‘s’:’’)+’)</span><span>$’+total().toFixed(2)+’</span></div><div class="srow"><span>Shipping</span><span style="color:#4ab84a">Local pickup only</span></div><div class="sdiv"></div><div class="stotal"><span>Total due at delivery</span><span>$’+total().toFixed(2)+’</span></div></div><div class="notice"><p class="ntext"><strong>Pay on delivery</strong> - no payment taken now. Cash or Zelle accepted when you collect.</p></div>’;
 F.innerHTML=’<button class="btn-gold" onclick="setStep(\'details\')">Continue</button>’;
 }
 
-function chgQty(slug,d){var i=cart.find(function(x){return x.slug===slug;});if(i)i.qty=Math.max(1,i.qty+d);renderCart();}
-function rmItem(slug){cart=cart.filter(function(i){return i.slug!==slug;});renderCart();}
+function chgQty(slug,d){
+for(var i=0;i<cart.length;i++){if(cart[i].slug===slug){cart[i].qty=Math.max(1,cart[i].qty+d);break;}}
+renderCart();
+}
+function rmItem(slug){
+var nc=[];for(var i=0;i<cart.length;i++){if(cart[i].slug!==slug)nc.push(cart[i]);}cart=nc;renderCart();
+}
 
 function renderDetails(){
 var B=document.getElementById(‘pbody’),F=document.getElementById(‘pfoot’);
-var miniItems=cart.map(function(i){return ‘<div class="mini-row"><span>’+i.name+’ x ‘+i.qty+’</span><span>$’+(i.price*i.qty).toFixed(2)+’</span></div>’;}).join(’’);
-B.innerHTML=’<button class="btn-back" onclick="setStep(\'cart\')">Back to cart</button><div class="mini"><p class="mini-label">Order summary</p>’+miniItems+’<div class="mini-total"><span>Total due at delivery</span><span>$’+total().toFixed(2)+’</span></div></div><div class="fg"><label class="flabel">Full name</label><input class="finput" id="fn" type="text" placeholder="Your name" value="'+(info.name||'')+'"><p class="ferr" id="en">Please enter your name</p></div><div class="fg"><label class="flabel">Phone number</label><input class="finput" id="fp" type="tel" placeholder="e.g. 010-1234-5678" value="'+(info.phone||'')+'"><p class="ferr" id="ep">Please enter a valid phone number</p></div><div class="fg"><label class="flabel">Email address</label><input class="finput" id="fe" type="email" placeholder="you@example.com" value="'+(info.email||'')+'"><p class="ferr" id="ee">Please enter a valid email</p></div><div class="fg"><label class="flabel">Preferred contact method</label><select class="fselect" id="fc"><option value=”” disabled ‘+((!info.contact_method)?‘selected’:’’)+’>Select one</option><option value=“SMS” ‘+(info.contact_method===‘SMS’?‘selected’:’’)+’>SMS</option><option value=“WhatsApp” ‘+(info.contact_method===‘WhatsApp’?‘selected’:’’)+’>WhatsApp</option><option value=“Email” ‘+(info.contact_method===‘Email’?‘selected’:’’)+’>Email</option></select><p class="ferr" id="ec">Please select a contact method</p></div><div class="fg"><label class="flabel">Shiny design request <span style="color:var(--muted);font-size:10px">(optional)</span></label><textarea class="ftextarea" id="fsh" placeholder="Describe any shiny colour variant you would like">’+(info.shiny||’’)+’</textarea><p class="fhint">Leave blank for the standard colour scheme.</p></div>’;
+var mi=’’;for(var i=0;i<cart.length;i++){mi+=’<div class="mini-row"><span>’+cart[i].name+’ x ‘+cart[i].qty+’</span><span>$’+(cart[i].price*cart[i].qty).toFixed(2)+’</span></div>’;}
+B.innerHTML=’<button class="btn-back" onclick="setStep(\'cart\')">Back to cart</button><div class="mini"><p class="mini-label">Order summary</p>’+mi+’<div class="mini-total"><span>Total due at delivery</span><span>$’+total().toFixed(2)+’</span></div></div><div class="fg"><label class="flabel">Full name</label><input class="finput" id="fn" type="text" placeholder="Your name" value="'+(info.name||'')+'"><p class="ferr" id="en">Please enter your name</p></div><div class="fg"><label class="flabel">Phone number</label><input class="finput" id="fp" type="tel" placeholder="e.g. 010-1234-5678" value="'+(info.phone||'')+'"><p class="ferr" id="ep">Please enter a valid phone number</p></div><div class="fg"><label class="flabel">Email address</label><input class="finput" id="fe" type="email" placeholder="you@example.com" value="'+(info.email||'')+'"><p class="ferr" id="ee">Please enter a valid email</p></div><div class="fg"><label class="flabel">Preferred contact method</label><select class="fselect" id="fc"><option value=”” disabled ‘+((!info.contact_method)?‘selected’:’’)+’>Select one</option><option value=“SMS” ‘+(info.contact_method===‘SMS’?‘selected’:’’)+’>SMS</option><option value=“WhatsApp” ‘+(info.contact_method===‘WhatsApp’?‘selected’:’’)+’>WhatsApp</option><option value=“Email” ‘+(info.contact_method===‘Email’?‘selected’:’’)+’>Email</option></select><p class="ferr" id="ec">Please select a contact method</p></div><div class="fg"><label class="flabel">Shiny design request <span style="color:var(--muted);font-size:10px">(optional)</span></label><textarea class="ftextarea" id="fsh" placeholder="Describe any shiny colour variant you would like">’+(info.shiny||’’)+’</textarea><p class="fhint">Leave blank for the standard colour scheme.</p></div>’;
 F.innerHTML=’<button class="btn-gold" onclick="validate()">Review order</button>’;
 }
 
@@ -367,14 +381,14 @@ function validate(){
 var n=document.getElementById(‘fn’).value.trim(),p=document.getElementById(‘fp’).value.trim(),e=document.getElementById(‘fe’).value.trim(),c=document.getElementById(‘fc’).value,sh=document.getElementById(‘fsh’).value.trim();
 var ok=true;
 function chk(fid,eid,test){document.getElementById(eid).style.display=test?‘none’:‘block’;document.getElementById(fid).classList.toggle(‘err’,!test);if(!test)ok=false;}
-chk(‘fn’,‘en’,n.length>0);chk(‘fp’,‘ep’,p.length>=7);chk(‘fe’,‘ee’,e.includes(’@’)&&e.includes(’.’));chk(‘fc’,‘ec’,c.length>0);
+chk(‘fn’,‘en’,n.length>0);chk(‘fp’,‘ep’,p.length>=7);chk(‘fe’,‘ee’,e.indexOf(’@’)>=0&&e.indexOf(’.’)>=0);chk(‘fc’,‘ec’,c.length>0);
 if(ok){info={name:n,phone:p,email:e,contact_method:c,shiny:sh};setStep(‘confirm’);}
 }
 
 function renderConfirm(){
 var B=document.getElementById(‘pbody’),F=document.getElementById(‘pfoot’);
-var miniItems=cart.map(function(i){return ‘<div class="mini-row"><span>’+i.name+’ Pokeball x ‘+i.qty+’</span><span>$’+(i.price*i.qty).toFixed(2)+’</span></div>’;}).join(’’);
-B.innerHTML=’<button class="btn-back" onclick="setStep(\'details\')">Edit details</button><div class="mini"><p class="mini-label">Items</p>’+miniItems+’<div class="mini-total"><span>Total due at delivery</span><span>$’+total().toFixed(2)+’</span></div></div><div class="cdetails" style="margin-bottom:1.25rem"><p class="mini-label" style="margin-bottom:9px">Your details</p><div class="crow"><span>Name</span><span>’+info.name+’</span></div><div class="crow"><span>Phone</span><span>’+info.phone+’</span></div><div class="crow"><span>Email</span><span>’+info.email+’</span></div><div class="crow"><span>Contact via</span><span>’+info.contact_method+’</span></div>’+(info.shiny?’<div class="crow"><span>Shiny request</span><span>’+info.shiny+’</span></div>’:’’)+’</div><div class="notice"><p class="ntext"><strong>Pay on delivery</strong> - cash or Zelle accepted. Nothing is charged now.</p></div>’;
+var mi=’’;for(var i=0;i<cart.length;i++){mi+=’<div class="mini-row"><span>’+cart[i].name+’ Pokeball x ‘+cart[i].qty+’</span><span>$’+(cart[i].price*cart[i].qty).toFixed(2)+’</span></div>’;}
+B.innerHTML=’<button class="btn-back" onclick="setStep(\'details\')">Edit details</button><div class="mini"><p class="mini-label">Items</p>’+mi+’<div class="mini-total"><span>Total due at delivery</span><span>$’+total().toFixed(2)+’</span></div></div><div class="cdetails" style="margin-bottom:1.25rem"><p class="mini-label" style="margin-bottom:9px">Your details</p><div class="crow"><span>Name</span><span>’+info.name+’</span></div><div class="crow"><span>Phone</span><span>’+info.phone+’</span></div><div class="crow"><span>Email</span><span>’+info.email+’</span></div><div class="crow"><span>Contact via</span><span>’+info.contact_method+’</span></div>’+(info.shiny?’<div class="crow"><span>Shiny request</span><span>’+info.shiny+’</span></div>’:’’)+’</div><div class="notice"><p class="ntext"><strong>Pay on delivery</strong> - cash or Zelle accepted. Nothing is charged now.</p></div>’;
 F.innerHTML=’<button class="btn-gold" id="pbtn" onclick="placeOrder()">Place order</button>’;
 }
 
@@ -383,18 +397,22 @@ var btn=document.getElementById(‘pbtn’);
 btn.disabled=true;btn.textContent=‘Placing order…’;
 var ref=genRef();
 var placedAt=new Date().toISOString();
-var itemsText=cart.map(function(i){return i.name+’ Pokeball x’+i.qty+’ - $’+(i.price*i.qty).toFixed(2);}).join(’\n’);
-var orderData={ref:ref,placed_at:placedAt,customer:{name:info.name,phone:info.phone,email:info.email,contact_method:info.contact_method},items:cart.map(function(i){return{slug:i.slug,name:i.name,qty:i.qty,unit_price:i.price,line_total:+(i.price*i.qty).toFixed(2)};}),total_usd:+total().toFixed(2),shiny_request:info.shiny||’’,payment:‘cash_or_zelle_on_delivery’,fulfillment:‘local_pickup’};
+var itemsText=’’;
+for(var i=0;i<cart.length;i++){itemsText+=cart[i].name+’ Pokeball x’+cart[i].qty+’ - $’+(cart[i].price*cart[i].qty).toFixed(2)+’\n’;}
+var orderItems=[];
+for(var i=0;i<cart.length;i++){orderItems.push({slug:cart[i].slug,name:cart[i].name,qty:cart[i].qty,unit_price:cart[i].price,line_total:+(cart[i].price*cart[i].qty).toFixed(2)});}
+var orderData={ref:ref,placed_at:placedAt,customer:{name:info.name,phone:info.phone,email:info.email,contact_method:info.contact_method},items:orderItems,total_usd:+total().toFixed(2),shiny_request:info.shiny||’’,payment:‘cash_or_zelle_on_delivery’,fulfillment:‘local_pickup’};
 document.getElementById(‘pbody’).innerHTML=’<div class="sending"><div class="spin"></div><p>Sending your order…</p></div>’;
 document.getElementById(‘pfoot’).innerHTML=’’;
-var emailPromise=typeof emailjs!==‘undefined’
-?emailjs.send(EMAILJS_SERVICE,EMAILJS_TEMPLATE,{order_ref:ref,placed_at:new Date(placedAt).toLocaleString(‘en-US’,{dateStyle:‘medium’,timeStyle:‘short’}),customer_name:info.name,customer_phone:info.phone,customer_email:info.email,items:itemsText,total_usd:total().toFixed(2)})
-:Promise.resolve();
 var orderXhr=new XMLHttpRequest();
 orderXhr.open(‘POST’,FIREBASE_FN_URL,true);
 orderXhr.setRequestHeader(‘Content-Type’,‘application/json’);
 orderXhr.send(JSON.stringify(orderData));
-emailPromise.then(function(){renderDone(ref);}).catch(function(){renderDone(ref);});
+if(typeof emailjs!==‘undefined’){
+emailjs.send(EMAILJS_SERVICE,EMAILJS_TEMPLATE,{order_ref:ref,placed_at:new Date(placedAt).toLocaleString(‘en-US’,{dateStyle:‘medium’,timeStyle:‘short’}),customer_name:info.name,customer_phone:info.phone,customer_email:info.email,items:itemsText,total_usd:total().toFixed(2)}).then(function(){renderDone(ref);}).catch(function(){renderDone(ref);});
+} else {
+renderDone(ref);
+}
 }
 
 function renderDone(ref){
@@ -411,10 +429,10 @@ function resetAndClose(){step=‘cart’;closeCart();}
 
 var ejsScript=document.createElement(‘script’);
 ejsScript.src=‘https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js’;
-ejsScript.onload=function(){emailjs.init(‘vO1JLR3TEoMLqHqhU’);};
+ejsScript.onload=function(){if(typeof emailjs!==‘undefined’)emailjs.init(EMAILJS_PUBLIC);};
 document.head.appendChild(ejsScript);
 
-window.addEventListener(‘load’,function(){loadDesigns();});
+loadDesigns();
 </script>
 
 </body>
