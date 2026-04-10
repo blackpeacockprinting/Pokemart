@@ -161,7 +161,7 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
   <ul>
     <li><a href="#shop">Shop</a></li>
     <li><a href="#about">About</a></li>
-    <li><a href="mailto:your@email.com">Contact</a></li>
+    <li><a href="/cdn-cgi/l/email-protection#760f19030436131b171f1a5815191b">Contact</a></li>
   </ul>
   <button class="nav-cart" onclick="openCart()">Cart <span class="cart-count" id="cart-count">0</span></button>
 </nav>
@@ -207,7 +207,7 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
 <footer>
   <div class="footer-logo">Black Peacock Printing</div>
   <p class="footer-credit">Figures based on designs by <a href="https://n3dmelbourne.com" target="_blank">N3D Melbourne</a> - Printed under commercial licence</p>
-  <div class="footer-links"><a href="#shop">Shop</a><a href="#about">About</a><a href="mailto:your@email.com">Contact</a></div>
+  <div class="footer-links"><a href="#shop">Shop</a><a href="#about">About</a><a href="/cdn-cgi/l/email-protection#ef96809a9daf8a828e8683c18c8082">Contact</a></div>
   <p class="footer-copy">2026 Black Peacock Printing - All rights reserved</p>
 </footer>
 <div class="panel" id="panel">
@@ -223,7 +223,7 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
   <div class="pbody" id="pbody"></div>
   <div class="pfoot" id="pfoot"></div>
 </div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var N3D_API_KEY = 'n3d_sk_q-FLJrMtYAqgGivAMEgrstEjgZdfQkXG';
 var EMAILJS_PUBLIC = 'vO1JLR3TEoMLqHqhU';
 var EMAILJS_SERVICE = 'service_chzr6eo';
@@ -414,7 +414,7 @@ ejsScript.src=‘https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.
 ejsScript.onload=function(){emailjs.init(‘vO1JLR3TEoMLqHqhU’);};
 document.head.appendChild(ejsScript);
 
-loadDesigns();
+window.addEventListener(‘load’,function(){loadDesigns();});
 </script>
 
 </body>
