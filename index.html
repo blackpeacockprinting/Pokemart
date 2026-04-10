@@ -188,7 +188,7 @@ footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3r
   <h2 class="section-title">All figures</h2>
   <p class="section-sub">Designs by N3D Melbourne - Local pickup only - Pay on delivery</p>
   <div class="filter-bar" id="filter-bar"></div>
-  <div id="shop-content"><div class="loading-state"><div class="loading-spinner"></div><p id="load-status">Not started yet</p><br><button onclick="loadDesigns()" style="background:#c9a84c;color:#000;border:none;padding:10px 20px;font-size:16px;cursor:pointer;border-radius:4px;margin-top:1rem">LOAD DESIGNS</button></div></div>
+  <div id="shop-content"><div class="loading-state"><div class="loading-spinner"></div><p id="load-status">Not started yet</p><br><button onclick="document.getElementById('load-status').textContent='BUTTON CLICKED'" style="background:#c9a84c;color:#000;border:none;padding:10px 20px;font-size:16px;cursor:pointer;border-radius:4px;margin-top:1rem">TEST</button></div></div>
 </div>
 <div class="n3d-banner" id="about">
   <div class="n3d-inner">
@@ -281,7 +281,7 @@ document.getElementById(‘shop-content’).innerHTML=’<div class="products-gr
 }
 
 function showError(msg){
-document.getElementById(‘shop-content’).innerHTML=’<div class="error-state"><p class="error-title">Could not load designs</p><p class="error-msg">’+msg+’</p><button class="retry-btn" onclick="loadDesigns()">Try again</button></div>’;
+document.getElementById(‘shop-content’).innerHTML=’<div class="error-state"><p class="error-title">Could not load designs</p><p class="error-msg">’+msg+’</p><button class="retry-btn" onclick="document.getElementById('load-status').textContent='BUTTON CLICKED'">Try again</button></div>’;
 }
 
 function loadDesigns(){
