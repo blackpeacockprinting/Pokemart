@@ -1,7 +1,6 @@
 const { onRequest } = require(“firebase-functions/v2/https”);
 const { google } = require(“googleapis”);
 const https = require(“https”);
-const cors = require(“cors”)({ origin: true });
 
 const SHEET_ID = “1mfRlr9EaR-XVMEf3W0LaJEEUQ9uS9llLsWTr0jz88ng”;
 const SHEET_TAB = “Sheet1”;
@@ -32,35 +31,55 @@ req.end();
 }
 
 exports.getDesigns = onRequest(
-{ region: “us-central1” },
-(req, res) => {
-cors(req, res, async () => {
-if (req.method !== “GET”) return res.status(405).json({ error: “Method not allowed” });
+{ cors: [”*”], region: “us-central1” },
+async (req, res) => {
+if (req.method === “OPTIONS”) {
+res.status(204).send(””);
+return;
+}
+if (req.method !== “GET”) {
+res.status(405).json({ error: “Method not allowed” });
+return;
+}
 const apiKey = req.headers[“x-api-key”];
-if (!apiKey) return res.status(401).json({ error: “Missing X-Api-Key header” });
+if (!apiKey) {
+res.status(401).json({ error: “Missing X-Api-Key header” });
+return;
+}
 try {
 const result = await n3dFetch(
 “/designs?category=character&limit=200&include=details&locale=KR”,
 apiKey
 );
-if (result.status !== 200) return res.status(result.status).json(result.body);
-return res.status(200).json(result.body);
+if (result.status !== 200) {
+res.status(result.status).json(result.body);
+return;
+}
+res.status(200).json(result.body);
 } catch (err) {
 console.error(“getDesigns error:”, err);
-return res.status(500).json({ error: “Failed to fetch designs”, detail: err.message });
+res.status(500).json({ error: “Failed to fetch designs”, detail: err.message });
 }
-});
 }
 );
 
 exports.submitOrder = onRequest(
-{ region: “us-central1” },
-(req, res) => {
-cors(req, res, async () => {
-if (req.method !== “POST”) return res.status(405).json({ error: “Method not allowed” });
+{ cors: [”*”], region: “us-central1” },
+async (req, res) => {
+if (req.method === “OPTIONS”) {
+res.status(204).send(””);
+return;
+}
+if (req.method !== “POST”) {
+res.status(405).json({ error: “Method not allowed” });
+return;
+}
 try {
 const { ref, placed_at, customer, items, total_usd, shiny_request } = req.body;
-if (!ref || !customer || !items) return res.status(400).json({ error: “Missing required fields” });
+if (!ref || !customer || !items) {
+res.status(400).json({ error: “Missing required fields” });
+return;
+}
 const auth = new google.auth.GoogleAuth({
 scopes: [“https://www.googleapis.com/auth/spreadsheets”],
 });
@@ -91,11 +110,10 @@ valueInputOption: “USER_ENTERED”,
 insertDataOption: “INSERT_ROWS”,
 requestBody: { values: [row] },
 });
-return res.status(200).json({ success: true, ref });
+res.status(200).json({ success: true, ref });
 } catch (err) {
 console.error(“submitOrder error:”, err);
-return res.status(500).json({ error: “Failed to save order”, detail: err.message });
+res.status(500).json({ error: “Failed to save order”, detail: err.message });
 }
-});
 }
 );
