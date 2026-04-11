@@ -95,7 +95,13 @@ function addToCart(slug,price,name,photo){
   for(var i=0;i<cart.length;i++){if(cart[i].slug===slug){existing=cart[i];break;}}
   if(existing){existing.qty++;}else{cart.push({slug:slug,price:price,name:name,photo:photo,qty:1});}
   document.getElementById('cart-count').textContent=count();
-  openCart();
+  flashCart();
+}
+
+function flashCart(){
+  var btn=document.getElementById('cart-count');
+  btn.style.background='#f0d080';
+  setTimeout(function(){btn.style.background='';},400);
 }
 
 function openCart(){document.getElementById('panel').classList.add('open');document.getElementById('ov').classList.add('open');renderStep();}
