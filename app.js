@@ -24,7 +24,10 @@ function getFilters(designs){
 
 function renderFilters(designs){
   document.getElementById('filter-bar').innerHTML=getFilters(designs).map(function(f){
-    return '<button class="filter-btn '+(f===activeFilter?'active':'')+'" onclick="setFilter(\''+f+'\')">'+(f==='all'?'All types':f)+'</button>';
+    var s=ts(f);
+var style=f==='all'?'':' style="border-color:'+s.border+';color:'+s.text+'"';
+var activeStyle=f==='all'?'':' style="background:'+s.bg+';border-color:'+s.border+';color:'+s.text+'"';
+return '<button class="filter-btn '+(f===activeFilter?'active':'')+'"'+( f===activeFilter?activeStyle:style)+' onclick="setFilter(\''+f+'\')">'+(f==='all'?'All types':f)+'</button>';
   }).join('');
 }
 
